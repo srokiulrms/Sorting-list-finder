@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kiul RMS Sorting list finder</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- PWA Manifest for Add to Home Screen -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#c4122f">
+    <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/India_Post_Logo.svg/512px-India_Post_Logo.svg.png">
+
+    <style>
+        :root { --dop-red: #c4122f; --dop-dark-red: #900c22; --dop-yellow: #f8b319; --bg-gray: #f4f6f9; --card-bg: #ffffff; --text-dark: #222222; --text-muted: #555555; --border-color: #dddddd; --badge-so: #0d6efd; --badge-bo: #198754; --badge-ho: #c4122f; --badge-beat: #6f42c1; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-gray); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; }
+        .top-nav { background-color: #2b2b2b; color: #ffffff; font-size: 0.78rem; padding: 6px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+        header { background: linear-gradient(135deg, var(--dop-red) 0%, var(--dop-dark-red) 100%); color: white; padding: 16px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); border-bottom: 5px solid var(--dop-yellow); }
+        .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .brand-title { display: flex; align-items: center; gap: 12px; }
+        .brand-title .logo-box { background: white; color: var(--dop-red); width: 46px; height: 46px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 2px 5px rgba(0,0,0,0.25); flex-shrink: 0; }
+        .brand-title h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: 0.3px; line-height: 1.2; }
+        .brand-title p { font-size: 0.8rem; color: #fde4a9; margin-top: 3px; font-weight: 500; }
+        .division-tag { background-color: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.35); padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        
+        /* Blue Quiz Button */
+        .btn-quiz { background-color: #0d6efd; color: #ffffff !important; border: 1px solid #0b5ed7; padding: 7px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); }
+        .btn-quiz:hover { background-color: #0b5ed7; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25); }
+        .btn-quiz:active { transform: translateY(0); }
+
+        .container { max-width: 1200px; margin: 16px auto; padding: 0 12px; flex: 1; width: 100%; }
+        
+        .search-card { background: var(--card-bg); border-radius: 8px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-top: 4px solid var(--dop-red); margin-bottom: 20px; }
+        
+        .search-box-wrapper { position: relative; margin-bottom: 12px; display: flex; align-items: center; }
+        .search-box-wrapper .search-icon { position: absolute; left: 14px; color: var(--text-muted); font-size: 1.1rem; pointer-events: none; }
+        .search-input { width: 100%; padding: 13px 48px 13px 42px; font-size: 1rem; border: 2px solid #ccc; border-radius: 8px; outline: none; transition: all 0.2s; }
+        .search-input:focus { border-color: var(--dop-red); box-shadow: 0 0 0 3px rgba(196, 18, 47, 0.15); }
+        
+        .voice-btn { position: absolute; right: 8px; background: none; border: none; color: var(--text-muted); font-size: 1.25rem; cursor: pointer; padding: 8px 10px; border-radius: 50%; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .voice-btn:hover, .voice-btn:active { color: var(--dop-red); background: #f1f3f5; }
+        .voice-btn.listening { color: var(--dop-red); animation: pulse-mic 1s infinite alternate; }
+        @keyframes pulse-mic { from { transform: scale(1); opacity: 1; } to { transform: scale(1.25); opacity: 0.6; } }
+        
+        .filters-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .filter-select { padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); background-color: white; font-size: 0.9rem; color: var(--text-dark); min-width: 140px; flex: 1 1 180px; outline: none; cursor: pointer; font-weight: 500; }
+        .filter-select:focus { border-color: var(--dop-red); }
+        .btn-print { background: var(--dop-red); color: white; border: none; padding: 10px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1 1 150px; transition: background-color 0.2s; }
+        .btn-print:hover { background: var(--dop-dark-red); }
+        .btn-reset { background: #f1f3f5; color: var(--text-muted); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: 1 1 90px; transition: all 0.2s; }
+        .btn-reset:hover { background: #e2e6ea; color: var(--text-dark); }
+        
+        .btn-install { background: #198754; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: 1 1 120px; transition: background-color 0.2s; }
+        .btn-install:hover { background: #146c43; }
+
+        .stats-badge { width: 100%; margin-top: 4px; font-size: 0.88rem; color: var(--text-muted); font-weight: 700; text-align: right; }
+        
+        /* TABULAR RESULTS STYLING */
+        .table-container { width: 100%; overflow-x: auto; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 25px; -webkit-overflow-scrolling: touch; }
+        .directory-table { width: 100%; border-collapse: collapse; min-width: 700px; text-align: left; font-size: 0.9rem; }
+        .directory-table th { background-color: #2b2b2b; color: #ffffff; padding: 12px 14px; font-weight: 600; font-size: 0.84rem; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
+        .directory-table th:first-child { border-top-left-radius: 7px; }
+        .directory-table th:last-child { border-top-right-radius: 7px; }
+        .directory-table td { padding: 12px 14px; border-bottom: 1px solid #edf0f2; vertical-align: top; line-height: 1.4; }
+        .directory-table tr:hover { background-color: #f9fbfd; }
+        .directory-table tr:last-child td { border-bottom: none; }
+        
+        .pin-badge { background: var(--dop-yellow); color: #000; font-weight: 800; padding: 3px 8px; border-radius: 4px; font-size: 0.82rem; letter-spacing: 0.5px; display: inline-block; white-space: nowrap; }
+        .type-badge { font-size: 0.72rem; padding: 3px 7px; border-radius: 4px; color: #fff; font-weight: 700; text-transform: uppercase; display: inline-block; white-space: nowrap; }
+        .type-so { background-color: var(--badge-so); }
+        .type-bo { background-color: var(--badge-bo); }
+        .type-ho { background-color: var(--badge-ho); }
+        .type-beat { background-color: var(--badge-beat); }
+        
+        .office-cell-name { font-weight: 700; color: var(--dop-dark-red); display: block; font-size: 0.95rem; }
+        .office-cell-parent { font-size: 0.78rem; color: var(--text-muted); }
+        
+        .village-pill-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
+        .table-village-pill { background-color: #f1f3f5; color: #222; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; border: 1px solid #e2e4e8; display: inline-block; }
+        .table-village-pill.highlight { background-color: #fff3cd; border-color: #ffe69c; color: #856404; font-weight: 800; }
+        
+        .empty-state { text-align: center; padding: 40px 16px; background: white; border-radius: 8px; border: 1px dashed #ccc; }
+        .empty-state i { font-size: 2.5rem; color: #bbb; margin-bottom: 10px; }
+        .empty-state h3 { font-size: 1.1rem; }
+        .empty-state p { font-size: 0.85rem; }
+
+        @keyframes blink-install {
+            0% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7); }
+            50% { opacity: 0.8; transform: scale(1.02); box-shadow: 0 0 10px 5px rgba(25, 135, 84, 0); }
+            100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); }
+        }
+        .blinking-btn {
+            animation: blink-install 1.5s infinite;
+        }
+        
+        @media (max-width: 650px) {
+            .brand-title h1 { font-size: 1.15rem; }
+            .brand-title p { font-size: 0.75rem; }
+            .header-actions { width: 100%; justify-content: flex-start; }
+            .division-tag { flex: 1 1 auto; justify-content: center; }
+            .btn-quiz { flex: 1 1 auto; justify-content: center; }
+            .filter-select, .btn-print, .btn-reset, .btn-install { flex: 1 1 100%; min-width: 100%; }
+            .stats-badge { text-align: center; margin-top: 8px; }
+            .directory-table { font-size: 0.82rem; }
+            .directory-table th, .directory-table td { padding: 10px 8px; }
+        }
+        
+        .print-header { display: none; }
+        @media print {
+            body { background-color: #ffffff !important; color: #000000 !important; font-size: 9pt; }
+            .top-nav, header, .search-card, footer { display: none !important; }
+            .container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            .print-header { display: block !important; border-bottom: 2px solid #000000; padding-bottom: 10px; margin-bottom: 15px; }
+            .print-header h2 { font-size: 14pt; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; }
+            .print-header p { font-size: 8.5pt; color: #444444; }
+            .table-container { border: 1px solid #000 !important; box-shadow: none !important; }
+            .directory-table th { background-color: #ddd !important; color: #000 !important; border-bottom: 1px solid #000 !important; }
+            .directory-table td { border-bottom: 1px solid #ccc !important; }
+            .pin-badge, .type-badge { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; }
+            .table-village-pill { background: none !important; border: 1px solid #bbb !important; color: #000 !important; font-size: 7.5pt !important; }
+            .table-village-pill.highlight { text-decoration: underline !important; font-weight: bold !important; }
+        }
+        footer { background: #222; color: #aaa; padding: 16px; font-size: 0.78rem; text-align: center; border-top: 3px solid var(--dop-red); margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <span><i class="fa-solid fa-flag"></i> Department of Posts &bull; Ministry of Communications &bull; Government of India</span>
+        <span>RMS 'PT' Division, Kiul</span>
+    </div>
+    <header>
+        <div class="header-content">
+            <div class="brand-title">
+                <div class="logo-box"><i class="fa-solid fa-envelope-open-text"></i></div>
+                <div>
+                    <h1>Kiul RMS Sorting list finder</h1>
+                    <p>RMS 'PT' Division, Kiul &bull; Nawada and Munger Dn directory</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="division-tag"><i class="fa-solid fa-map-location-dot"></i> Nawada and Munger Dn directory</div>
+                <a href="https://shyamal2021.github.io/Sumit_jha_shyam-s_bro/postal_sorting_test_app.html" class="btn-quiz" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-solid fa-circle-question"></i> Quiz
+                </a>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="print-header" id="printHeader">
+            <h2>DEPARTMENT OF POSTS &bull; INDIA</h2>
+            <p><strong>RMS 'PT' Division, Kiul &bull; Sorting &amp; Beat Directory Report</strong></p>
+            <p id="printMeta" style="margin-top: 4px; font-size: 8pt; color: #555;"></p>
+        </div>
+
+        <div class="search-card">
+            <div class="search-box-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search village, PIN, office (e.g. Navada, Munger)..." autofocus>
+                <button type="button" class="voice-btn" id="voiceSearchBtn" title="Voice Search"><i class="fa-solid fa-microphone"></i></button>
+            </div>
+            <div class="filters-row">
+                <select id="pinFilter" class="filter-select"><option value="">All PIN Codes</option></select>
+                <select id="soFilter" class="filter-select"><option value="">All Parent SOs / HOs</option></select>
+                <select id="typeFilter" class="filter-select">
+                    <option value="">All Office Types</option>
+                    <option value="H">Head Post Office (HO)</option>
+                    <option value="S">Sub Post Office (SO)</option>
+                    <option value="R">Branch Post Office (BO)</option>
+                    <option value="B">Delivery Beat</option>
+                </select>
+                <button class="btn-print" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Report</button>
+                <button class="btn-reset" id="resetBtn"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                <button class="btn-install blinking-btn" id="installBtn" style="display: none;">
+                    <i class="fa-solid fa-download"></i> Install App
+                </button>
+                <div class="stats-badge" id="statsCount">Ready to search</div>
+            </div>
+        </div>
+        
+        <div id="resultsContainer"></div>
+    </div>
+    <footer>
+        <p>&copy; 2026 RMS 'PT' Division, Kiul &bull; Department of Posts &bull; India Post Sorting Network</p>
+    </footer>
+
+    <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('SW Registered:', reg.scope))
+          .catch(err => console.error('SW Registration failed:', err));
+      });
+    }
+    
+    // Handle native Android Install Prompt
+    let deferredPrompt = null;
+    const installBtn = document.getElementById('installBtn');
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (installBtn) {
+        installBtn.style.display = 'inline-flex';
+      }
+    });
+    
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response: ${outcome}`);
+        deferredPrompt = null;
+      });
+    }
+    
+    window.addEventListener('appinstalled', () => {
+      if (installBtn) {
+        installBtn.style.display = 'none';
+      }
+      deferredPrompt = null;
+    });
+
+    let rawData = [
+["Nawada HO", "805110", "BEAT", "B", "HOSPITAL ROAD|SADAR HOSPITAL|GOLA ROAD|KADAM KUWAN|SONARPATTI|SBI BAZAR BRANCH|INDRA CHOWK|STATION ROAD|MALGODAM|PROFESSOR COLONY|CHHAYA ROAD|THATHERI GALI|KANHAI NAGAR|KANHAI HIGH SCHOOL|3 N0. BUS STAND|GANDHI NAGAR|MIRZAPUR|NEHALUCHAK|SIDHESHWARPUR|KLS COLLEGE|KONIYAPAR|SURYA MANDIR|NANOURA ROAD|UNION BANK|CENTRAL BANK|NAWADA HO|MAIN ROAD|PRAJATANTRA CHOWK|LAL CHOWK|VIJAY BAZAR|SABJI BAZAR|PURANI BAZAR|OLD COURT ROAD|SDO OFFICE|ZILA PARISHAD|NAGAR PARISHAD|REGISTARY OFFICE|CENTRAL BANK|SBI MAIN BRANCH|GARH PAR|KALALI ROAD|NARDIGANJ ROAD|MUSLIM ROAD|RMW COLLEGE|PHAL GALI|SKM COLLEGE|NEW AREA|PATAL PURI|NUTRAJ CINEMA|OLD JAIL ROAD|PRASAD BIGHA|CANARA BANK|PNB BANK|IDBI BANK|COLLECTORIATE|DEO NAWADA|PROJECT GIRL SCHOOL|ABHYASH MIDDLE SCHOOL|NAVIN NAGAR|SHIV NAGAR|PATEL NAGAR|POSTMARTEM ROAD|HARSCHANDRA STADIUM ROAD|GOVARDHAN MANDIR|YADAV CHOWK|JAWAHAR NAGAR|TOWN THANA ROAD|MANGARBIGHA|BANK OF INDIA|BANK OF BARODA|LIC OFFICE|SAHARA OFFICE|BAJAZ ALLIANCE OFFICE|UCO BANK|DBGB|MAHILA THANA|SC/ST THANA|RLSY COLLEGE|HONDA SHOW ROOM|ICICI BANK|HDFC BANK|AGRAWAL PETROL PUMP|SASTRI NAGAR|GOPAL NAGAR|S.P KOTHI|D.M KOTHI|HERO SHOWROOM|BLOCK OFFICE NAWADA|BLOCK COLONY|SBI ADB|RAM NAGAR|RAJENDRA NAGAR|YAMUNA PATH|CHAURASIYA COLONY|HANUMAN NAGAR|GANDHI SCHOOL|CO-OPERATIVE BANK|INDIAN BANK|BSNL OFFICE"],
+["Nawada Kutchery SO", "805111", "Nawada Kutchery SO", "S", "GONAWA|MOTI BIGHA|JUNGLE BELDARI|ATAUAA|JAIN MANDIR|RAMJI NAGAR|SHIV NAGAR|LAXMI PUR|LOHANI BIGHA|NAWADA COURT|VIP COLONY"],
+["Nawada Kutchery SO", "805111", "Mahanandpur BO", "R", "Mahanandpur|Jarauli|Jalalpur|Barail|Dariyapur|Police line|Bela|Shanti Nagar"],
+["Nawada Kutchery SO", "805111", "Sisma BO", "R", "Sisma|Gausnagar|Neya|JaySingh Bihga|Fiktaura|Sakra|Ariyan|Shiv Narayan Bigha|Badhai Bigha|Shiv Charan Bigha|Chutakiya Bigha|Motnaje|Dhandhauli|Sohjana|Khiru Bigha|Mahuli"],
+["Nawada Kutchery SO", "805111", "Hasapur BO", "R", "Hasapur|Daye Bigha|Amitpur Bara|Chatar|Kalaunda"],
+["Nawada Kutchery SO", "805111", "Pachara BO", "R", "Pachara|Dhurihar|Ranipur|Bhabnauli"],
+["Nawada Kutchery SO", "805111", "Bhabhnaur BO", "R", "Bhabhnaur|Dhamaul|Matuk Bigha|Khanpur"],
+["Nawada Kutchery SO", "805111", "Asarhi BO", "R", "Asarhi|Bhagwanpur|Jhunathi|Pranpur|Sikandarpur|Domra|Harinarayanpur"],
+["Nawada Kutchery SO", "805111", "Chhatihar BO", "R", "Chattihar|Maluk Bigha|Manohar Bigha|Chita Bigha|Chandra Shekhar Nagar|Indra Nagar|Balkisun Bigha"],
+["Parnawada SO", "805112", "PARNAWADA SO", "S", "MADHUWAN|DEVI ASTHAN|PANJIYAR MORH|MALIK TOLA|NEEM TOLA|NONIYA TOLA|DARJI TOLA|MIRDHA TOLA|TELI TOLA|TAKIYA PAR|RAHMAT NAGAR|AFJAL NAGAR|RAJBANSI NAGAR|BUNDEL KHAND|RAJAULI ROAD|MOGALAKHAR|ANSAR NAGAR|NEW ASAR NAGAR|KAN COLONY|KAMALPUR|MASTAN GUNJ|KARAM GALI|BUDHAUL|GAYA ROAD|BARI DARGAH|SARIF COLONY|ISLAM NAGAR|GONDA PUR|KHARIDI BIGHA|BHADAUNI|POLICE LINE|SUDAMA NAGAR|AMBEDKAR NAGAR|CHAUDHARY NAGAR|ALI NAGAR|ASHUTOSH NAGAR|FAIJUL BARI|RASUL NAGAR|SULEMAN NAGAR|NARENDRA NAGAR|GULZAR NAGAR|MILAT COLONY"],
+["Parnawada SO", "805112", "DERMA BO", "R", "DERMA|BALAM PUR|CHANDAULI|SABAIYA|GOPALPUR|SANOKHARA|SADHAULI|PATEL NAGAR"],
+["Parnawada SO", "805112", "DIRI BO", "R", "DIRI|BELDARI|RAMPUR|METHEPUR|KARAM BARHORI|SANGAMPUR|RAMGUNJ MUNDIPUR|LAXAMI BIGHA|HASAN PUR"],
+["Parnawada SO", "805112", "FARHA RAHIMABAD BO", "R", "FARHA|CHETA BIGHA|NIGARI|NANHU BIGHA|MADHUBAN|DUDAULI|PANEY BIGHA|RAJA DEWAR|AZAD NAGAR|KAMESHWAR BIGHA"],
+["Parnawada SO", "805112", "MAKHAR BO", "R", "MAKHAR|GOPALPUR|MANE BIGHA|GAZIPUR|NONAY|LOHANIPUR|BAGHANA|RUNI PUR|HURRAHI|KUMHAR BIGHA"],
+["Parnawada SO", "805112", "NANAURA BO", "R", "NANAURA|RATAN PUR|MEGHU BIGHA|BHAGWAL BIGHA|KHEMCHAND BIGHA|MOHADIPUR|SHIVDAYAL BIGHA|KEWAL BIGHA|MUSAN BIGHA|PURNA DIH|SAHEB CHAK|JAGDISHPUR"],
+["Parnawada SO", "805112", "PITHAURI BO", "R", "PITHAURI|GOBIND BIGHA|BALA BIGHA|JAMALI CHAK|LEBAR|DULAM BIGHA|GHASI BIGHA|KARMAN BIGHA|SHRI CHAND NAGAR|BHIKHAM PUR|HAZI DAB|HAZARAT PUR|NAWADIH|LALKESHWAR BIGHA|SUPAY"],
+["Parnawada SO", "805112", "TEYAR BO", "R", "TEYAR|BARAUA|MOHNAR|MARO PUR|MAHAT PUR|SAKARPURA|TEL BIGHA|GANJHAR|AJLAT BIGHA|DAIVA|MAYA PUR|TARO PUR|DARGAHI BIGHA|JAGAT PUR|JAMALI CHAK|LAGUNA|MAHULI|TARAUNI|KEYA PUR|NEYA PUR|SHANTI NAGAR"],
+["Pakribarwan SO", "805124", "Pakribarwan SO", "S", "Bhagwanpur|Khapura|Pakri|Mirzapur|Raje Bigha|Bajpur|Bhulan Dargha|Dostali Bihga|Gulzarbagh|Hamuman Nagar|Koyri Tola|Shanti Nagar|Chhoti Talab|Purab Tola|Momin Tola|Lohar Tola|Kachna|Hasanganj|Mohan Bigha|Chanda Bigha|Pinparba|Jilbaria|Kartara|Bartara|Aman Bagh|Chaman Bagh|Bari Talab|Sabsinia Bigha|Jalpar|Sudanpur"],
+["Pakribarwan SO", "805124", "Konandpur BO", "R", "Konandpur|Barhauna|Rajbariya|Karmaniya|Chhatarwar|Maulanagar|Chatar Mor"],
+["Pakribarwan SO", "805124", "Jiuri BO", "R", "Jiuri|Beghrajpur|Akauna|Rukki|Purani Jiuri|Loharpura|Situa Mor"],
+["Pakribarwan SO", "805124", "Simaria BO", "R", "Simaria|Lillo|Kurheta"],
+["Pakribarwan SO", "805124", "Marwa BO", "R", "Marwa|Bardhman Nagar|Gopalpur|Gulzarbagh|Lalchand|Sahu Nagar|Shankar Bigha"],
+["Pakribarwan SO", "805124", "Chandradeep BO", "R", "Chandradeep|Darama|Palsa khurd|Kutukchak|Telar|Bela"],
+["Pakribarwan SO", "805124", "Rayes BO", "R", "Rayes|Barewapar|Laxmipur|Aabidbigha|Charihari|Gangti"],
+["Pakribarwan SO", "805124", "Datraul BO", "R", "Datraul|Kapsandi|Mahnajitpur"],
+["Pakribarwan SO", "805124", "Arha BO", "R", "Arha|Matbalwa|Jagdishpur|Palsa durg|Laxman bigha|Ambedkar Nagar|Samhariya Bigha|Samhariya"],
+["Pakribarwan SO", "805124", "Gulni BO", "R", "Bari Gulni|Chhoti Gulni|Atari|Kapsipur|Amarpur|Hanuman Garhi|Rampur"],
+["Pakribarwan SO", "805124", "Budhauli BO", "R", "Budhauli|Budhauli Paschimi|Tarabigha|Tarhar|Bisunpur|Deora|Rajbariya|Pakariya dih|Koriya bigha|Bhalua|Atari|Bhurha"],
+["Pakribarwan SO", "805124", "Kabla Kharat BO", "R", "Kabla|Kharat|Hasna|Sinduara|Belhatti|Asma|Ulten|Atari|Bhalki|Chhanab Paschimi"],
+["Dumrawan SO", "805132", "Dumrawan SO", "S", "Dumrawan|Baliyari|Gita Nagar|Barki Mahal|Medhipur|Laxmipur"],
+["Dumrawan SO", "805132", "Baghi Bardiha BO", "R", "Baghi Bardiha|Harla|Mangura|Maya Bigha|Abdalpur|Khojpura|Bhalua|Gangta|Baghi|Mangura Khurd|Banda Bigha|Chandra Shekhar Nagar|Bhalua|Jogna|Mahadalit Tola"],
+["Dumrawan SO", "805132", "Kheshauri BO", "R", "Khesauri|Lodipur|Bajidpur|Odhpura|Baliyari|Jafarpur|Bisunpur|Poksi|Madhpar|Udrahi|Dhurapar|Mahepur"],
+["Dumrawan SO", "805132", "Dosut BO", "R", "Dosut|Jiyapur Tanr|Rohua|Kathokari|Kewal Bigha|Raikar"],
+["Dumrawan SO", "805132", "Samrigarh BO", "R", "Samrigarh|Jalalpur|Vijaynagar|Sundargarh|Samrighar Dakshini|Adampur|Rostampur|Kharijama|Devali|Samraitha|Chorwar|Goithadih|Bhelwa|Bahera|Gulan Bihga|Sitapur|Banshi Chak|Gola Nagar|Benghi|Morma|Beldariya|Chandal Chowk|Chakwara|Mehaddipur|Bihta|Laxmipur"],
+["Dumrawan SO", "805132", "Aruri BO", "R", "Aruri|Laxmipur|Badiha|Bajwara|Salempur|Budhan Bigha|Bariyarpur|Rewar|Mallepur"],
+["Dumrawan SO", "805132", "Dhewdha BO", "R", "Dhewdha|Dola|Lakhanpura|Dharmi Bigha|Madhurapur|Vijaypur|Chotki Marhal"],
+["Kosi SO", "805107", "KOSI SO", "S", "KOSI|RUKHI|AJAY NAGAR|LALUN NAGAR|BALIYARI|GODIHARI|BHANDAJOR|GHORAHI|SATHE|KARMA|SHADI PUR|CHANAUN|BASHANT NAGAR|SHEKHPURA|HARSIT PUR|PRASHADI NAGAR|DHOLI CHAK"],
+["Kosi SO", "805107", "BHATTA GARH BO", "R", "BHATTAGARH|JAGARA|KAZI CHAK|NIJAMAT|KRITI BHATT|KATAHARA"],
+["Kosi SO", "805107", "MAHRAMA BO", "R", "MAHRAMA|PRATAP PUR|ANAILA|BADA PADIYA"],
+["Kosi SO", "805107", "KUNDA BHALUA BO", "R", "KUNDA|BHALUA|KRAN PUR|SHIKHAR PUR|AMBEDKAR NAGAR"],
+["Kosi SO", "805107", "BAGHORE BO", "R", "BAGHORE|KATHWAN|DAYARI|VISHANU NAGAR|ENGAN NAGAR"],
+["Kosi SO", "805107", "SIUR BO", "R", "SIUR|MAHAKAR|SHANTOSH NAGAR|GARUARA|DEGAMA|BADAIL|KATAIYA|ADRAKHI DIH|BELDARIYA"],
+["Rajhat SO", "805126", "RAJHAT SO", "S", "AKBARPUR|RAJHAT|MAKHDUMPUR|BALIYA BUJURG|PINDRAUNI|BALIYA KHURD|BHAT BIGHA|KANAUJ|KASHI CHUA|ITMA|PACHTARWA|JAKHE|DEVI PUR|LOHSINGHA|SIRKATA|PASIYA KALA|PASIYA KHURD|GANGHRIYA|PAHARPUR|POKHRA|AJIM CHAK|GURU CHAK|PANCHRUKHI|MAHIMA BIGHA|LODIPUR|NEJAMA|RATAN PUR|TILAK BIGHA|HANUMAN GARH|BERIYATADH|PANTI"],
+["Rajhat SO", "805126", "BAKSANDA BO", "R", "BAKSANDA|RAMDEO|DOPATA|KHANPURA|MADAINI|ALAKHDIHA|KENDUA|GERANDI|MOGHAIN|MOTI NAGAR"],
+["Rajhat SO", "805126", "B RAMPUR BO", "R", "RAMPUR|BHAWANI GARH|KHARSAN|GOTUM|GAJODIH|GEYAR|RAHIM BIGHA|DHAKANI|KHAKUNDUA|PADUM BIGHA|VIJAY NAGAR|ORIYA"],
+["Rajhat SO", "805126", "FATEHPUR MORE BO", "R", "FATEHPUR|PATANGI|DEWARA|SHEKHPURA|DARIYAPUR|DAMODAR PUR|DIHI|GURU CHAK|DAD PUR|ASHA BIGHA|PARYAG|ASHRAF PUR|DHANI BIGHA|DULLA BIGHA|AMBEDKAR NAGAR"],
+["Rajhat SO", "805126", "KORIYANA BO", "R", "BHAWANPUR|KORIYANA|DANIYAR|PIPARA|PATALUKA|EKTIYA|HARNA|BELA|ALAKH DIHA KRISHNA NAGAR|BARHAI BIGHA"],
+["Rajhat SO", "805126", "KUHILA BO", "R", "KUHILA|SHADI PUR|PURAINI|SIRPAT|BUDHUA KHURAD|BUDHUA|KHIRA KALA|JAIPUR|CHHAPRA|LAXAN NAGAR|S. PACHRUKHI|KUNDIL PUR|GAJAL PUR"],
+["Rajhat SO", "805126", "KUSUMHAR BO", "R", "KUSUMHAR|KULANA|BHUMAI|PIRAUTA|PIPARA KHURD|SURAJPURA"],
+["Rajhat SO", "805126", "PAHARPUR BO", "R", "PAHARPUR|PATRANG|CHADIPUR|PAIJUNA|RAMPUR|SESAWA|BHIKHAM PUR"],
+["Rajhat SO", "805126", "SUGHARI BO", "R", "SUGHARI|THANI|GHURMUDIYA|JETASARI|MAHARAJ GANJ|PURNA DIH|PATHARA|TAHAWAL BIGHA|RAJ NAGAR|KARPURI NAGAR|GANDHI NAGAR|JAYPRAKASH NAGAR|CHIRTRA NAGAR|PATHAL CHATY|GARANDI|EKTARA|SIKARIYA|BARHKURWA|MOHGAUYA|KARHARI|KARHARA|THALI KHURD|MURGEYA CHAK|KASHIKHATI|TAHWAL BIGHA"],
+["Rajhat SO", "805126", "KULNA BO", "R", "KULNA|PAKRI|SHAPUR|SHERPUR"],
+["Rajhat SO", "805126", "PAIJUNA BO", "R", "PAIJUNA|MADHOPUR|DHOV GAHATI|ORAIYA|SAPATO"],
+["Govindpur SO", "805102", "GOVINDPUR SO", "S", "GOVINDPUR|BELA|SHORHA|PIPARA|DELHUA|SHEKHOPUR|KAMAL PUR|HAR NARAYAN PUR|BARATAR|DARSHAN|INDRA NAGAR|BINOWA NAGAR"],
+["Govindpur SO", "805102", "BISHUNPUR BO", "R", "BISUNPUR|DERA|DHANECHEK"],
+["Govindpur SO", "805102", "MADHOPUR BO", "R", "MADHOPUR|PIPARIYA|CHARKI|PIPARIYA DIH"],
+["Govindpur SO", "805102", "SARKANDA BO", "R", "SARKANDA|MAHABRA|SARSWATI BIGHA|KHIDAKI PAR|SHIKHAR PUR"],
+["Govindpur SO", "805102", "TETARIYA BO", "R", "TETARIYA|BANIYA BIGHA|MAKHDUM PUR|GANGA DIH|KAMALPUR|SARBAHAN PUR|KUMAHAR BIGHA"],
+["Kowakol SO", "805106", "KOWAKOL SO", "S", "KOWAKOL|SARAUNI|RADHWA|KAPSIYA|PARBHA NAGAR|TARAUN|RANI BAZAR|GANDHI DHAM|BARIYAR PUR|PAWAPURI|BIJHO|JOGA CHAK|JORAB DIH"],
+["Kowakol SO", "805106", "MANJHILA BO", "R", "MANJHILA|AMAR PUR|VIDAYA SAGAR|DUDHIYA TAD|BANDHI CHAK|LOH SIGANA|SALAIYA|KOLWAR|MANDARA|RAMPUR|PHUS BANGLA"],
+["Kowakol SO", "805106", "KADHAR BO", "R", "KADHAR|KARMA TAD|RUSTAM PUR|KARHARA|BHANDARI|BRAUN|LETHALA|BELDARIYA"],
+["Kowakol SO", "805106", "MADHURA PUR BO", "R", "MADHURA PUR|TELHATA|HASAN PUR|LILA DIH|MANIYA TARI|TIKO DIH|PAHARPUR|JANAR|DUDHAPANIYA|NEMTUL|PACHAMBA"],
+["Kowakol SO", "805106", "KHARSARI BO", "R", "KHARSARI|KHAIRA|SATHE|NADSIA"],
+["Kowakol SO", "805106", "OKHARIYA GOLABAZAR BO", "R", "OKHARIYA|PALI|MAHUAY|KATANI|BUKAR|BIRADAWAN|BISUNPUR|BADRAJEE"],
+["Kowakol SO", "805106", "MAHAPUR CHHABAIL BO", "R", "MAHAPUR|CHHABAIL|BAJITPUR|KHAIRA|AKARI|BARAIN|KALODH|DARAWA"],
+["Kowakol SO", "805106", "SEKHODEWRA BO", "R", "SEKHODEWRA|BASUDEOPUR|SHIV PUR|CHOGAWA|BARAIYA DIH|GUDDI GHAT|TURIYA DIH"],
+["Kowakol SO", "805106", "LALPUR BO", "R", "LALPUR|MARPO|DUMHAN|BHAWAR KOL|TELIYA GHADI|PARTAP PUR|CHADARA|REHADI"],
+["Kowakol SO", "805106", "D ITPAKWA BO", "R", "DEVAN GRAH|ITPAKWA|GHORAM BAGH|KOLHUABAR|BANAILI|BANAILI KHURD|HAHA PUR"],
+["Kowakol SO", "805106", "RANI GADAR BO", "R", "RANIGADAR|MAHULIYA TAND|DANIYA|VIKO|JHARANA|TARMA TAND"],
+["Kowakol SO", "805106", "MAHUDAR BO", "R", "MAHUDAR|MANANPUR|GAY GHAR|BHUDHI GHAT|PHARKI PATHAR"],
+["Roh SO", "805141", "ROH SO", "S", "ROH|MUSE PUR|HARBANS BIGHA|MANIO CHAK|SHIV DANI NAGAR"],
+["Roh SO", "805141", "MARARA BO", "R", "MARARA|ISHE PUR|RATAU|MADHUM PUR|RAM PUR"],
+["Roh SO", "805141", "RUPOW BO", "R", "RUPOW|KASMARA|SINGHANA|PATORI|JOBANA|BHIKHAM PUR|MAHAULI|BENIPUR|DIAURA"],
+["Roh SO", "805141", "PHULDIH BO", "R", "PHULDIH|CAHAL|PHAREDA|PANDEY GANGAUT|MAN SAGAR|DIP NAGAR|PATORI|JOGNA|SABADA"],
+["Roh SO", "805141", "SUNDARI DUMARI BO", "R", "SUNDARI|DUMARI|DHAB|TIRAWA|BARA"],
+["Roh SO", "805141", "NAWADIH BO", "R", "NAWADIH|NIMA DIH|RAJAOG|JAILA|KAUSHAL NAGAR|DIP NAGAR|CHAROL|GONAR BIGHA|GOPAL PUR|PASHUPATI BIGHA"],
+["Roh SO", "805141", "KEWALI BO", "R", "KEWALI|AMARPUR|KARMA|BHALUAHI|BUDHAN BIGHA"],
+["Nemdarganj SO", "805121", "NEMDARGANJ SO", "S", "NEMDARGANJ|INDAUL|MALIKPUR|MAYAPUR SANAGAT|JOGANA|FULAMA|NANAURI|SUPAUL"],
+["Nemdarganj SO", "805121", "LAKHMOHNA BO", "R", "LAKHMOHNA|KHAIRA|LEDHA|DHANWARA|ADRASH NAGAR"],
+["Nemdarganj SO", "805121", "BAKSOUTI BO", "R", "BAKSOUTI|MAHESH PUR|LAKHPAT BIGHA|BALLIYA|G.P. NAGAR"],
+["Nemdarganj SO", "805121", "BUDHWARA BO", "R", "BUDHWARA|RATANI|BHARGOAN|MISHRI CHAK|KOLJA|PARAITHA|ALIPORE|KUTARU CHAK|KUMHAR BIGHA"],
+["Nemdarganj SO", "805121", "BHANAIL BO", "R", "BHANAIL|LODIPUR|BALLIYA|JAHANA|SUPAYA|RAMGARH|BELATAND|JOGANA|GOSAI BIGHA"],
+["Nemdarganj SO", "805121", "DUMARI BO", "R", "DUMARI|GAJIPUR|VINAYAK|TAJPUR"],
+["Nemdarganj SO", "805121", "CHHOTI AMMAN BO", "R", "CHHOTI AMMAN|GOGAN|DAKARA|JAFARA"],
+["Nemdarganj SO", "805121", "PACHGAWAN BO", "R", "PANHGAWAN|MAYAPUR|NEYAPUR|PARTO KARAHARI"],
+["Nemdarganj SO", "805121", "MAHESHDIH BO", "R", "MAHESH DIH|ASHAMA|KAJHIYA|CHAPREHAT|NAD|SRI RAMPUR|GANTA"],
+["Nemdarganj SO", "805121", "BAREW BO", "R", "BAREW|BHAGAL PUR"],
+["Nemdarganj SO", "805121", "PHULWA BO", "R", "PHULWAN|GANTA|PATORY|LAXAMI PUR"],
+["Kadirganj SO", "805104", "KADIRGANJ SO", "S", "KADIRGANJ|SONU BIGHA|SHAJ PURA|MOBARAK PUR|ANTI|NATHAN PURA|RANI HATTI|PATAWA SARAI|GOPAL GUNJ|JAMUWAN|ANAND PURA|ASHARI|KHUTAUNI"],
+["Kadirganj SO", "805104", "BERMI BO", "R", "BERMI|SIMARI|HAIBAT PUR|BESHAN PUR"],
+["Kadirganj SO", "805104", "SHADIPUR BO", "R", "SHADIPUR|HASAN PURA|DULAR PURA|VIJAY NAGAR|LOHAR PURA|JHARAYANA|CHILANGIYAN|RAJA BIGHA|GURUMAHA|KARIM CHAK|KAMALAPURA|BHARAT PURA|UDASA|BHOLA BIGHA"],
+["Kadirganj SO", "805104", "KHALSA DIBARI BO", "R", "SAMAI|KHALSA DIBARI|PACHIYA DIH|SAKULA CHAK|SIKANDRA|SIRPAT|SABAIYA|SAKAR DIH|MAHMADALI CHAK"],
+["Kadirganj SO", "805104", "GHOSTHAMA BO", "R", "GHOSTHAMA|DEBAN PURA|JAGAT PUR|DALDALHA|KHAPRAHI"],
+["Kadirganj SO", "805104", "OHARI BO", "R", "OHARI|PACHAMBA|KHARGUBIGHA|KORBIGHA|KUNG|KUNGAILA|PACHOHIYA"],
+["Kadirganj SO", "805104", "MARUI BO", "R", "MARUI|BHANDARI|SUNDRA|MANPUR|RAM NAGAR|DINANATH NAGAR|LAXMI PUR|LALPUR|DURGA PUR|NARAYAN PUR|SABADA|KAGI CHAK"],
+["Kadirganj SO", "805104", "NAZARDIH BO", "R", "NAZARDIH|HEMJA|NATMA|BHOLA NAGAR|NADAURA|FATAN PUR|BALCHAND BIGHA|PARIYA"],
+["Kadirganj SO", "805104", "PAURA BO", "R", "PAURA|LAKHAN PURA|MAYA BIGHA|NAHAR PAURA|KORIYA BIGHA"],
+["Kadirganj SO", "805104", "DERMOBARA BO", "R", "DERMOBARA|BARA|JHAKHORE|BHATTHA|KAZI CHAK"],
+["Kadirganj SO", "805104", "RAJAPUR SAUR BO", "R", "RAJAPUR|SAUR|PACHWARA|DAULAT PUR|HEMDA"],
+["Kadirganj SO", "805104", "KUMBHI BO", "R", "KUMBHI|MAHADIPUR|CHANDI PUR|MALUKA BIGHA|KUMBHI BELDARIYA"],
+["Sirdal A SO", "805127", "SIRDALA SO", "S", "SIRDALA|GULAB NAGAR|CHAK PAR|KOLDIHA|BARHI BIGHA|KUSHAHAN|NIMDA|BABNI NAGMA|SHAHPUR|RAJAUNDH|BARADIH|AKAUNA|AHIYAPUR|KASHIYA DIH|JAY PRAKASH NAGAR|BAHUYARA|KEWAL|JEHAL DIH"],
+["Sirdal A SO", "805127", "MANJHAULI BO", "R", "MANJHAULI|IMNATAND|NAWADIH|BISUNPUR|PAHARI PAR|KALALI MORE|BALAATAN|SONAR|JAY NAGAR|BARDHA|KUMHRET|JHARNA|PRAN PUR"],
+["Sirdal A SO", "805127", "CHAUBEY BO", "R", "CHAUBEY|PAREYA|BIHWALPUR|RAJA BIGHA|BHALUA|ANJARI|CHHOMULA|GONDPUR|BARSOL|NAWADA|TAKIYA|SONWAY|BHITA"],
+["Sirdal A SO", "805127", "RAMRAICHAK BO", "R", "RAMRAICHAK|JIRWATARI|KHEWAI|MOHANRIYA|KALAUNDA|LABANI|MADDI|PARARIYA|AMGHAT|LOHGADAWA|NAWADIH|NANDUDIH|DINWADIH|BAIRITAND|PIPARA TAND|BAHADURPUR|MURAR KURAHA|BITIYA|KARIGIDHI"],
+["Sirdal A SO", "805127", "SANDH MANJHGAWAN BO", "R", "SANDH|MANJHGAWAN|GOPAL PUR|BILARPUR|BHUSAHAR|MANPUR|NAGWEL|MOHGAY|MOHANPUR|PURNA DIH|TUNDA|ANGARA|CHULHARI|BILARPUR|PICHHALI|NAGWEL SHIVPUR|BHOLADIH|BELATAND|PACHAMAWA|HARNARYANPUR|BHANADARI|PANCHANPUR|LAXMI BIGHA|GOSAI BIGHA|SHERPUR|MURTIYA|HEMAJA"],
+["Sirdal A SO", "805127", "SHERPUR BO", "R", "SHERPUR|ENARWA DIH|PARTAPUR|BHADARA|JAMUA|BASERIYA|CHAPARI|PIPRA|PRATAPPUR|BANDHI|JHARNA|PHULWARIYA"],
+["Sirdal A SO", "805127", "BANDHI BO", "R", "CHAILI|TONWA|KEWAL|PANDAY DIH|KASHIYA DIH"],
+["Sirdal A SO", "805127", "ABDUL BO", "R", "ABDUL|SUKHNAR|HATMARWA|HERA KURHA|DUMAR KURHA|TRIPA KURHA|KAMAL KURHA|PHURULA"],
+["Sirdal A SO", "805127", "GHAGHAT BO", "R", "GHAGHAT|PAND DAWAR|DHOB PATHAR|MUGALSHARAI|BAGESHWARI|KENDUA TAND"],
+["Sirdal A SO", "805127", "DHIRAUNDH BO", "R", "DHIRAUNDH|NAWAB GANJ|HAZIPUR|CHARGARAWA|THEAKHI|BANSHITAND|BARIYA TAND|BANSHI BIGHA|SAMPATH BIGHA|KHARAUNDH"],
+["Rajauli SO", "805125", "RAJAULI SO", "S", "RAJAULI|MAHSAI|TAKIYA|KUNDLA|MALIK TOLA|GOPAL NAGAR|SAMAR KOL|CHAPRA|VANDAN|PRAN CHAK|VINOYA NAGAR|DHAB|PARSHA|INGUN TAD|KHANPURA|SHIVPUR|TAKUYA TAND|CHAHUNHA|MANGALA|BAUDHI KALA|GHASIYA DIH|DULAR PUR|BHAGANPUR|EKAMBA|BALIYA|RAM DIHA|CHAUTHA|RAM DASHI|NAWADIH|PAR RAJAULI|NIMA TAND|KUMHARUA|DUMAR KOL|CHAP HEL|RAJA BIGHA|JHIRJHO|SARMAG PUR"],
+["Rajauli SO", "805125", "ANDHARWARI BO", "R", "ANDHARWARI|MAHIYARA|RANIPUR|SALEM PUR|MANPUR|MANAN PUR|DAMODAR PUR|MITHA PUR|KHAJORI BIGHA|PARMESHWAR BIGHA|SOBHA BIGHA|DULAM BIGHA"],
+["Rajauli SO", "805125", "CHAMOTHA BO", "R", "CHAMOTHA|BILASPUR|USMAN|PIPAR PATI|MUREHNA|BHUPAT PUR|MANDIH|HERO DIH|KASHIMA DIH|PAHWA CHAK|JOGANI|KAJI KAST|GAGAN|GAGAN KHURD"],
+["Rajauli SO", "805125", "BAHADURPUR BO", "R", "BAHADURPUR|MOHANPUR|KARI GOAN|CHAMAR BIGHA|KHIJUA|MANGO DIH|BAJBA TARI|HATHO CHAK|MOHKAMA"],
+["Rajauli SO", "805125", "DHAMANI BO", "R", "DHAMANI|EKCHATWA|SHIV NARAYAN BIGHA|SABAL PUR|CHARNO|DHAB|CHATHANI|KRAN PUR|ADHWARBA"],
+["Rajauli SO", "805125", "TARGIR BO", "R", "TARGIR|LENGURA|HANUMAN GADH|BAIJADA|KASHI CHAK|BIJWAN|DAMODAR PUR|JAMALPUR|DHARAM PUR|PASRAILA|DHAMAUL|LAXMI PUR|RAJA BIGHA"],
+["Rajauli SO", "805125", "SINGAR BO", "R", "SINGAR|HALDIYA|BHAUR|PHULWARIYA|CHECK POST|KACHRI DIH|CHITARKOLI|DEWAUR|RATANPUR|GOPALPUR|DUDHIYA MATTI"],
+["Rajauli SO", "805125", "BANSGOPAL BO", "R", "BANSGOPAL|AMAWAN|GANGA BIGHA|HORILA|BELA DIH|GAJO DIH|LAXMI BIGHA|KARHRA|MANHAR|KAIRI KHAP|DINA BIGHA|KAJHI CHAK|BANSHI TAND|DARIYA PUR|MAHABAT PUR|PRAN PUR|JARIYO|PRATAP PUR"],
+["Rajauli SO", "805125", "JOGIYAMARAN BO", "R", "JOGIYAMARAN|SATGIR|BHITTA|TARMAKALA|KENDUA|TELIYA|BARA|BHAKHORI"],
+["Rajauli SO", "805125", "SAWAIYA TAND BO", "R", "SAWAIYA TAND|BASRON|SIRSATAND|BARA TAND|CHATKARI"],
+["Rajauli SO", "805125", "DELWA BO", "R", "DELWA|PIPARIYA|PARSONIYA|MARMO|BHANE KHAB|SUAAR LETI|KUMBHIYA TARI|CHOR DIHA"],
+["Narhat SO", "805122", "NARHAT SO", "S", "NARHAT|KUSA|BURALI|IZHARCHAK|BANIABIGHA|IBRAHIMPUR|BAJITPUR|CHANDELBAGH|BAGHA BAR|OLIPUR|CHAHALCHAK|MOHAN NAGAR|GOPAL NAGAR"],
+["Narhat SO", "805122", "PUNAUL BO", "R", "PUNAUL|GANGA RAMPUR|GANGAPUR|SAIDPUR|GOSAI BIGHA|GANGTA|PANDEY CHAK"],
+["Narhat SO", "805122", "RAJA BIGHA BO", "R", "ABGIL|NARAYAN PUR|SAHJADIPUR|MISHRICHAK|BARBATTA"],
+["Narhat SO", "805122", "RASALPUR BO", "R", "RASALPUR|NEEMA|LAKHAURA|SHANKAR BIGHA|LACHHU BIGHA|SITAMARHI|LAXMIPUR|AJITGARH|MUDHETA CHAK"],
+["Narhat SO", "805122", "SAIDAPUR GWASA BO", "R", "SAIDAPUR GWASA|SAIDPUR|BADALPUR|DAULATPUR|CHHOTI NAWADA|NAWADA BELDARI|HULASGANJ|CHANDIPUR|BHIKHAMPUR"],
+["BKSK SO", "805114", "BKSK SO", "S", "KHANWA|KHUSIYAL BIGHA|BAIJNATHPUR|TARAN|BHAGALPUR|VIJAYPUR|FATEHPUR|DEDHGAON|MANIKPURA|BANDACHAK|EKAMBA|HASSANPURA"],
+["BKSK SO", "805114", "ANKARI BO", "R", "ANKARI|PANDEY BIGHA|DASHRATHPUR|KANUNGO BIGHA"],
+["BKSK SO", "805114", "BARGAON BO", "R", "BARGAON|CHANDBIGHA|PADMAUL|ISMAILPUR|AMOKHARI|RAVIO|SOHAR BIGHA|RAVIO BIGHA|RAJABIGHA"],
+["BKSK SO", "805114", "G. B. KENDUA BO", "R", "KENDUA|NAAD|BHALUAHI|BHATTBIGHA|UPARDIH|RATANPUR|BARATARH|PIRAUTA|LODIPURCHAK|KHALKHAU"],
+["BKSK SO", "805114", "KONIBAR BO", "R", "KONIBAR|DEORA|RAMPUR|DARIAPUR|BIHARI BIGHA|PATHRAUL|RADHEBIGHA"],
+["BKSK SO", "805114", "LOND BO", "R", "LOND|HEMJA|CHAMOTHA|HAJRA|SIDHAUL|JANGHAUL|NARAULI|CHANDELGARH|MUNI|SOHARBIGHA|RUPANBIGHA|HIRANAGAR"],
+["BKSK SO", "805114", "RAJAN BO", "R", "RAJAN|AMAHDI|BERARI|SAHOPUR|DUDHAILI|RAMESHARBIGHA|DUBRIBIGHA|GIREIARA|CHIRAIYA"],
+["Sirari SO", "811107", "SIRARI SO", "S", "SIRARI|JAY MANGLA|OTHMA|BHATCHAK"],
+["Sirari SO", "811107", "B BARTARA BO", "R", "BARHARA|BARTARA|RAMNAGAR|JAHANA"],
+["Sirari SO", "811107", "BHADOUS BO", "R", "BHADOUS|MADARI|MAHSAR|RAJAULI|DARIYAPUR|BHADOUS BELDARIYA"],
+["Sirari SO", "811107", "BHADAUSI BO", "R", "BHADOUSI|KOYLA|BAMGHAT|GHAT KUSUMBHA"],
+["Sirari SO", "811107", "BILLO BO", "R", "BILLO|BIHTA"],
+["Sirari SO", "811107", "DIH KUSUMBHA BO", "R", "DIH KUSUMBHA|AKARPUR|SUJALPUR|GADBADIYA|BATAURA|MURBARIYA|BRINDAVAN"],
+["Sirari SO", "811107", "KACHHIYANA BO", "R", "KACHIYANA|DOGAY|BIKKAM|TILOKHAR|GARSANDA"],
+["Sirari SO", "811107", "KAITHMA BO", "R", "KAITHMA|BARMA"],
+["Sirari SO", "811107", "NADIYAMA BO", "R", "NADIYAMA|BHAMARIYA"],
+["Sirari SO", "811107", "PACHNA BO", "R", "PACHNA|NIRPUR|MANPUR|BELDARIYA"],
+["Sirari SO", "811107", "PRATAP PUR BO", "R", "PRATAPPUR|KHURIYARI|BAMUARA|KUMAITHA|FATEHPUR|MOHIYA|KARUNACHAK|LAHUARA|DHANAMA"],
+["Sirari SO", "811107", "R MASAURHA BO", "R", "MAHSAURHA|SISMA|FULAIYA"],
+["Sirari SO", "811107", "S IMAM NAGAR BO", "R", "SURARI|IMAMNAGAR|BAKIYABAD|RADHA NAGAR|BACHHIYA BIGHA"],
+["Wazirganj SO", "805131", "WAZIRGANJ SO", "S", "WAZIRGANJ|BHABHANDI|PUNAMA|MUNDIPUR|NAUDIHA|NAUDIHA KHURD|JOGIBIGHA|DAKHINGAON|KUMRET|BHRETI|MIRGANJ|MAULANAGAR|BAIJNATHPUR|SITARAMPUR|PRATAPPUR|MUBARAKCHAK|MOTIBIGHA|BARAUNI|SINDUARI|PURA"],
+["Wazirganj SO", "805131", "AMETHI BO", "R", "AMETHI|ORAIL|MAHUEIT|AAROPUR|LOSINGHNA|MACHALBIGHA|RAMPUR|KAILASHPUR|BAHALPUR|BRINDAVAN"],
+["Wazirganj SO", "805131", "ARHWAN BO", "R", "ARHWAN|BILOND|ICHUA|PIPRA"],
+["Wazirganj SO", "805131", "BISUNPUR BO", "R", "BISUNPUR|HARSA|DHARAMPUR|JAMUNAPUR|BALJODI BIGHA|ASNAULI|DAYAL CHAK|BANIADIH|KHALARI|ANDHU|SUMNI|MALATHIA|PARSAMA|DEVACHAK|BHOJPUR|CHAULA BIGHA|EKMA|KUSUTARH"],
+["Wazirganj SO", "805131", "GHARIYA BO", "R", "GHARIYA|BIHIAIN|KHIRI|MAHUET|CHAHAL|LAXMIPUR|MATHURAPUR|GHAGHAPAR|BAGOTHAR BIGHA|BITHRA"],
+["Wazirganj SO", "805131", "KAJOOR BO", "R", "KAJOOR|KARSI"],
+["Wazirganj SO", "805131", "KARISOWA BO", "R", "KARISOWA|NARAYANPUR|BELABIGHA|AMBEDKARNAGAR|BASADBIGHA"],
+["Wazirganj SO", "805131", "KHARAUA BO", "R", "KHARAUA|JAMUNAPUR|SUKHEBIGHA|NIMA|DAMODARA|TIKRACHAK|KULBIGHA"],
+["Wazirganj SO", "805131", "KHARHARI CHIRAILLA BO", "R", "KHARHARI|KHARHARI COLONY|BHINDAS|BHINDAS PAIMAR|BHINDAS BANGLA|SINGHWARA|ITAWAN|RAJAPUR|CHIRAILLA|ITAWAN BIGHAPAR|SHEKHABIGHA|KAIYA"],
+["Wazirganj SO", "805131", "GOGHA BO", "R", "GOGHA|SANAUT|SARAIYA|DUHARI MUBARAKCHAK|HALALCHAK|NIMA|NAROGHATR|KOILIPUR|BAHERA|BUDHI PAIMAR|MAHIYARA"],
+["Wazirganj SO", "805131", "KHIRIAWAN BO", "R", "KHIRIAWAN|BODCHAK|KAUAKOH|KAJHA|ITWAN|BARKVAN|CHAKSEV|BIKASNAGAR|JANAKPUR"],
+["Wazirganj SO", "805131", "KOLHANA BO", "R", "KOLHANA|RAGHUNATHPUR|ISHWARPUR"],
+["Wazirganj SO", "805131", "KURKIHAR BO", "R", "KURKIHAR|UMANBIGHA|PATHRAURA|ARARIADIH|JAGDEONAGAR|EKTA NAGAR"],
+["Wazirganj SO", "805131", "MANJHAULI BO", "R", "MANJHAULI|KAJARA|BELBE|FATEHPUR|LOHJARA|PAHARPUR"],
+["Wazirganj SO", "805131", "PANLEY BO", "R", "PANLEY|SHANKAR BIGHA|BUDHGARIA|SARSA|HURDAHI|BHAGALPUR|FAIJNAGAR|EKAMBA|BHIKHAMPUR"],
+["Wazirganj SO", "805131", "RAJWARA BO", "R", "RAJWARA KHURD|BICHHA|SHIVLAL BIGHA|MARADDI|MOHRA|ASHA BIGHA|RAJWARA KALA|PADMAUL|BARBIGHA"],
+["Wazirganj SO", "805131", "S NAWADA BO", "R", "S NAWADA|KOPBA|KORIAUTHI|BADALBIGHA|ORIAPUR|TELWAY|GIRAIYA|GOVINDPUR"],
+["Wazirganj SO", "805131", "SAHIYA BO", "R", "SAHIYA|ERU|SINGATHIA|AYODHYAPUR|JANAKPUR|SIRISIRAJI|INDRANAGAR|BAIRIA|LAKHAUNA|KHONDHI|MACCHARDIHA"],
+["Wazirganj SO", "805131", "SINGHWARA BO", "R", "SINGHWARA|GHURIAMA|BAILU|KAHAUNA|BHARETHITOLA"],
+["Nardiganj SO", "805109", "NARDIGANJ SO", "S", "NARDIGANJ|SADIPUR|DARIAPUR|SAHAJPURA|JAFRA|LODIPUR|BIKKU|NANDPUR|PASAI|DHANIAWAN|AKAUNA DARIAPUR|AKAUNA|FALGU|BALWAPAR|BUCHI|GOTRAIN|NANAURA|PARARIYA|MIRCHAIGANJ|PABDA"],
+["Nardiganj SO", "805109", "ARANIKESOPUR BO", "R", "ARANIKESHOPUR|LOSGANI|DINESHNAGAR|BASAR|PIRAISU|SURAPUR|CHANDAILLA|GANDHINAGAR|KANSIADIH"],
+["Nardiganj SO", "805109", "REULA BO", "R", "REULA|PADEBIGHA|PACHURUKHI|PADEBIGHA NADIPAR|MAHAPUR|MAHAPUR PAHAR|CHEYA"],
+["Nardiganj SO", "805109", "SARSU BO", "R", "SARSU|PESH|VIJAY NAGAR|BELDARI|SANDALPUR"],
+["Nardiganj SO", "805109", "SEOTAR BO", "R", "SEOTAR|MANKA|JOTA|BHATTU BIGHA|DHARAM BIGHA|DHAUKAL BIGHA|MADHYA BIGHA|PAKRI|CHANDPURA|PATHRAURA|SIRA|BELARU|NAWADHA BIGHA"],
+["Nardiganj SO", "805109", "DOHRA BO", "R", "DOHRA|KESAURIYA|SANGOWAR|PATHRA|CHAURMA|BANGANGA|MUZAFFARNAGAR|AZADNAGAR"],
+["Nardiganj SO", "805109", "HANRIYA BO", "R", "HANRIYA|SITARAMPUR|RAMPUR|GOPALNAGAR|RAJIV NAGAR"],
+["Nardiganj SO", "805109", "ICHUAKARNA BO", "R", "ICHUAKARNA|ICHUA|SULTANPUR|BADLUBIGHA|NANDPUR|KARNA|BELDARI"],
+["Nardiganj SO", "805109", "KAHUARA BO", "R", "KAHUARA|KAHURAI SARAI|MAYABIGHA|BHATTBIGHA|GARHI|RAMEY|HAJIPUR"],
+["Nardiganj SO", "805109", "KOSLA BO", "R", "KOSLA|FATAHPUR|DAYALI BIGHA|TADHPAR|MIYAN BIGHA|CHAINPURA|MAHADE BIGHA|BASTI BIGHA"],
+["Nardiganj SO", "805109", "MASAURHA BO", "R", "MASAURHA|PACHU BIGHA|BILAI CHAK|BADSERA|MAHABATPUR|DOMABAR|MATHAINI|CHHILKAPUR|BISHANPUR|BALWAPAR|BARIO|HIRMAN BIGHA|JANKI BIGHA|CHIRIAYAWAN"],
+["Nardiganj SO", "805109", "ORRO BO", "R", "ORRO|JAGDISHPUR|ADAMPUR|NATHUPAR|BHAWANIPUR|BASTIBIGHA|BAHADURGANJ|TADPAR|BHELU BIGHA|MAHADEO BIGHA"],
+["Nardiganj SO", "805109", "PACHEA BO", "R", "PACHEA|PESH|VIJAY NAGAR|BELDARI|SANDALPUR"],
+["Nardiganj SO", "805109", "PRAMA BO", "R", "PRAMA|KHUSHIYAL BIGHA|KAJIBIGHA"],
+["Tungi SO", "805129", "TUNGI SO", "S", "TUNGI|JAMUAWAN|KARCHHAL|MURGIANCHAK|MANAINI|TILORA|GOVINDPUR|RAMKISHUN BIGHA|BARATU BIGHA|SUNDARVAN|TIKAPAR|SHIVPUR BALVA|CHAK PAR|DIHARI BIGHA|HASSANPUR|RAJKUMAR BIGHA|KOIRI BIGHA|NAUDIHA|HARLA"],
+["Tungi SO", "805129", "ARANDI BO", "R", "ARANDI|SONPURA|BADOSAR|MAKHDUMPUR|PURNADIH|MIYA BIGHA|CHORABARA|BANDHI|KUSAPAR|GHAROHI|ORAINA|TIMBAL BIGHA|BELWAL|ABHIRAMA"],
+["Tungi SO", "805129", "BHADSENI BO", "R", "BHADSENI|LATAUR|BELARU|CHANDRASHEKHAR NAGAR|DAULATPUR|RAJBIGHA|CHAMARBIGHA|BHIMBIGHA"],
+["Tungi SO", "805129", "MANJHWAY BO", "R", "MANJHWAY|CHITARGHATTI|KATGHARA|NADGARA|DHARAMPUR|SARAI BELDARI|UMRAON BIGHA|BODHI BIGHA|RAMBAZAR|RAGHUNATHPUR MILKY"],
+["Tungi SO", "805129", "DARIYAPUR BO", "R", "Dariyapur|Malti|Keharbigha|Maltibalwapar|Kishunpura|Gondarbigha|Jamalchak|Alam Bigha|Karamchak|Lanka dalapur|Muzaffarpur"],
+["Tungi SO", "805129", "DHANDHAR BO", "R", "Dhandhar|Jagatpur|Baikatpur|Mahmadpur|Jamuawan Beldari|Bakhura|Sikandarpur Tola|Haribigha"],
+["Tungi SO", "805129", "KHANPUR BO", "R", "Khanpur|Jalalpur|Kaghibigha|Surajpur|Barhibigha|Kandha|Milkipar|Rengana|Sikandarpur|Laxmipur|Damdibigha|Shankarbigha"],
+["Meskaur SO", "805142", "MESKAUR SO", "S", "Meskaur|Dohra|Sukhmaran|Gangawara|Chandawara|Bairiyatadh|Laxmibigha|Mahrajganj|Kamalbigha|Rampur|Dimagibigha"],
+["Meskaur SO", "805142", "MEDHKURI BO", "R", "Medhkuri|Pichhli|Purnadih|Paroriya|Pathra|Rankajalalpur|Sampatbigha"],
+["Meskaur SO", "805142", "TETARIA BO", "R", "Tetaria|Chhotki Tetariya|Alma|Rafiganj|Chaderdeh|Satua|Gamrah|Haidarchaak|Thanubigha|Gatauli|Bairiatarh"],
+["Meskaur SO", "805142", "BIJUBIGHA BO", "R", "Bijubigha|Bokhara|Kopin|Dgangama"],
+["Hasua SO", "805103", "HASUA SO/Hisua SO", "S", "HISUA|BHULANBIGHA|KAHARIA|BELDARIA|DOMAN BIGHA|BHELWA|LAKSHMIPUR|NASRATPUR|KHAIRAT BIGHA|URSA|NANDLAL BIGHA|BALIYARI|JHIKARUA|TARAUNI|SARTAKIA|SINGHAULI|DUMRI|GURUCHAK|PHULWARIA"],
+["Hasua SO", "805103", "BAGODAR BO", "R", "Bagodar|Bajra|Mahmadpur|Ghuriha|Mahadeva|Modibigha|Karamchak|Modibigha"],
+["Hasua SO", "805103", "BAIJNATHPUR BO", "R", "Baijnathpur|Repura|Tekpur|Barat|Jamui|Sirsa|Amarpur|Kendua|Bijay Ngar|Pahari|Khalifa Bigha|Sultanganj"],
+["Hasua SO", "805103", "BARAT SARAI BO", "R", "Sahbajpur Sarai|Nadsena|Bahadurpur|Gandhinagar|Jarahiya|Hassanchak|Mohgay"],
+["Hasua SO", "805103", "BARHAUNA BO", "R", "Barhauna|Srirampur|Chainpur|Gundra|Budhaul|Amri|Vijay Nagar|Marua|Hadsa|Madhwachak"],
+["Hasua SO", "805103", "CHHOTA JAMUARA BO", "R", "Chhota Jamuara|Bhim Bigha|Chainpura|Kasiara|Gajra Chatar|Sindhuari|Rahul Nagar|Baju Chak|Minapur|Bansinagar|Daninagar"],
+["Hasua SO", "805103", "CHHOTA SHIEKHPURA BO", "R", "Chhota Sheikhpura|Berota|Gospur|Kutnibigha|Bijaynagar|Kajipura"],
+["Hasua SO", "805103", "CHHOTIPALI BO", "R", "Chhotipali|Badi Pali|Deora|Deora Beldaria|Daulatpura|Guruchak"],
+["Hasua SO", "805103", "DHANWAN BO", "R", "Dhanwan|Keshavpur|Eknar|Garobigha|Garobigha Beldari|Rarobigha Rajwaria|Dhanwa Tola|Keshavpur Beldari|Shivalakpur|Dhanwa Rajwaria"],
+["Hasua SO", "805103", "DONA BO", "R", "Dona|Dafalpura|Jaisribigha|Dihuri|Murkatta|Balabigha|Bholabigha|Dayalibandh|Murgiachak"],
+["Hasua SO", "805103", "KAITHIR BO", "R", "Kaithir|Chak|Vijay Nagar|Ajay Nagar|Murdaliachak"],
+["Hasua SO", "805103", "PUNTHAR BO", "R", "Punthar|Karma|Manma|Pattalbigha|Shakti bigha"],
+["Hasua SO", "805103", "SACHAUL BO", "R", "Sachaul|Khiranbigha|Pkariya|Anarpur|Dinabigha|Baguli|Pachubigha|Saidpur|Milky"],
+["Hasua SO", "805103", "SIHIN BO", "R", "Sihin|Chak Sihin|Tarauni|Achalpur|Khunbalwa|Azadnagar|Sonsa"],
+["Tarwan SO", "805128", "TARWAN SO", "S", "TARWAN|BARHIBIGHA|POKHRA|JASSPUR|GUMA|MODANBIGHA|GULZARBIGHA|ALHNA|BALA"],
+["Tarwan SO", "805128", "B. MAKHDUMPUR BO", "R", "B Makhdumpur|Hemja|Baliyari|Gurha|Rampur|Tothi|Ruday|Patihula|Ranitothi|Bhangausa|Kujhi|Mayapur|Pranpur|Malakhpur|Majhiawan|Tetaria BO|Barabigha|Barabhitia|Ledapur|Herodih"],
+["Tarwan SO", "805128", "BAIJDA BO", "R", "Baijda|Bara|Jharipar|Jharipar tola|Aima Guljarbigha|Thakur bigha|Baisaria|Janakpur|Kalyanpur|Partpur"],
+["Tarwan SO", "805128", "CHOWAR BO", "R", "Chowar|Mahiyarpur|Sarkanda|Dewra|Sonbigha|Bhagatchak|Athkurwa|Mangrair|Chhkauri bigha|Manmadhav|Punaul|Paharpur|Pragasbigha|Beldari|Muddachak|Takia|Shantinagar|Bisfitta"],
+["Tarwan SO", "805128", "DHARAMPUR BO", "R", "Dharampur|Naudiha|Ganeshpur|Paranpur|Tenghara|Reganiatad|Karri|Karma|Dadpur|Sultanpur"],
+["Tarwan SO", "805128", "DUMRI BO", "R", "Dumri|Manjhauli|Dumri Tarh|Baduan|Kachanpur|Bajaul|Barbaria|Bagothar|Muddachak|Gobardhan nagar|Badaun tarhpar|Barkail"],
+["Tarwan SO", "805128", "KENAR BO", "R", "Kenar Chatti|Vsari|Barbigha|Veerbigha|Ambedkarnagar Chatti|Mayabigha|Mahadeva|Chandakhurd|Kenardih|Langrabaghi|Khushiyalbigha|Dubribigha|Hariyarpur|Banabigha|Khajuri|Ambedkarnagar|Bhura|Milky"],
+["Tarwan SO", "805128", "KOTHAR BO", "R", "Kothar|Amaur|Raghunibigha|Khimaria|Kalyanpur|Janakpur|Pipra|Premnagar|Piprabigha|Manjhauli"],
+["Tarwan SO", "805128", "M.H.CHAK BO", "R", "Mirjapur|Chainbigha|Hussainchak|Goila|satanbigha|Newalchak|Dhibra|Pawai|Jhikatia|Baijda"],
+["Tarwan SO", "805128", "MAHUGAIN BO", "R", "Mahugain|Harli Tarli|Dumarawan|Koshmar|Dedaur|Amuchak|Chanda|Barhibigha|Budhaul"],
+["Tarwan SO", "805128", "NAGWAN BO", "R", "Nagawan|Manjhla|Navailla|Farka|Chhothara|Bakhari|Heru|Pidiya|Bherwa|Alawalpur|Beldaria"],
+["Tarwan SO", "805128", "PASARHI BO", "R", "Pasarhi|Nimchak|Madaridhav|Khajuri|Radhemohan bigha|Laxman Bigha|Bisiyaik|Dhobni|Gulzarbigha|Raghunandan Bigha"],
+["Giriyak SO", "803109", "GIRIYAK SO", "S", "GIRIYAK|BIGHAPAR|SIKANDRA|GAURI GHAT|MANGAR BIGHA|DAKBANGLA ENGLISH|GHORAHI|PAKWAPAR|BARHI BIGHA|GARERIYA BIGHA|NEYAR BIGHA|BENGALI BIGHA|SHIVLAL BIGHA|GULZAR BIGHA|BAROKHAR|MARKATTA|KOYRIBIGHA|GAUSGANJ|BHADAUJ"],
+["Giriyak SO", "803109", "GOPALPUR BO", "R", "GOPALPUR|BARNAWAN|MURGIACHAK|BHAGWAT BIGHA|GONU BIGHA|RAMPUR|TIKA BIGHA|MANANCHAK|BELDARIYA|MARUHARI"],
+["Giriyak SO", "803109", "PURAINI BO", "R", "PURAINI|MANPUR|TAKHTROZA|KHARANT|BHALUA TAND|HASANPUR|PANTHALA"],
+["Giriyak SO", "803109", "ADAMPUR BO", "R", "ADAMPUR|BALAK BIGHA|MANJAN PURA|KANDOPUR|BADHETA|BELDARIYA|RATAUA|PATORIA|ISHAPUR"],
+["Giriyak SO", "803109", "RAITER BO", "R", "RAITER|KALIBIGHA|BELDARIYA|TUNTIPUR|TARAPUR|BISUNPUR|THAKUR BIGHA|MAHBATPUR|DURGA NAGAR|SHANKARPUR|JUNAIDI|HATHICHAK|DARIYAPUR"],
+["Giriyak SO", "803109", "KHANPUR BO", "R", "KHANPUR|JALALPUR|JALALPUR BIGHA|PACHHLAUA|MAHATPURA|HAIBATPUR|RAUDPUR"],
+["Giriyak SO", "803109", "BINDIDIH BO", "R", "BINDIDIH|KADAMTAR|GORMA|SITABIGHA|GURUDAYAL BIGHA|KHEMJIBIGHA|KONIPAR|PURAN BIGHA|KAMAL BIGHA|BAKSU"],
+["Giriyak SO", "803109", "MOW BINDIDIH BO", "R", "CHANDI MA|PAWADIH|BELAUR|JAYMITHUN BIGHA|DHARMPURA|MANU BIGHA|TETAR BIGHA|DHAMAR|SAMSERA|CHAMARDIHA|LAXMIPUR"],
+["Katrisarai SO", "805105", "KATRISARI SO", "S", "KATRISARAI|SUNDARPUR|BAJRACHAK|KATRIDIH|AHIYACHAK|MIRCHAYGANJ|JAWAHAR CHAK"],
+["Katrisarai SO", "805105", "BADI BO", "R", "BADI|KATARPUR|GAURAIYA BIGHA|RAUDI|TARAUNI|BAKHERAPUR|BALWAPAR"],
+["Katrisarai SO", "805105", "BHAGWANPUR BO", "R", "BHAGWANPUR|MAYAPUR|KATARDIH"],
+["Katrisarai SO", "805105", "BAHADURGANJ BO", "R", "BAHADURGANJ|GOVARDHAN BIGHA|RANISARAI|BALCHAN BIGHA|SAHABAD|BARANDI"],
+["Katrisarai SO", "805105", "GAZIPUR BO", "R", "GAZIPUR|SAKUCHI SARAI|BASOBAD|SAKUCHIDIH"],
+["Katrisarai SO", "805105", "MARIA BARITH BO", "R", "MAIRA|BARITH|KOYRIBIHGA|RASALPUR|BALCHANDBIGHA"],
+["Lalbigha SO", "805108", "LALBIGHA SO", "S", "LALBIGHA|BADRIBIGHA|PALNI|MAHANANDPUR|KABIRPUR"],
+["Lalbigha SO", "805108", "PARWATI BO", "R", "PARWATI|SHAHPUR|NEPURA"],
+["Lalbigha SO", "805108", "APSARH BO", "R", "APSARH|NURDICHAK|BELDARIYA|BHERIYA|FATHA|BHAWANI BIGHA"],
+["Lalbigha SO", "805108", "BAJITPUR BO", "R", "BAJITPUR|SAGMA"],
+["Lalbigha SO", "805108", "BALI BO", "R", "DEVANBIGHA|BALI|JAMUAWAN|BALIBIGHA"],
+["Lalbigha SO", "805108", "REWRA MAHRATH BO", "R", "REWRA|MAHRATH|RAMNAGAR|COLONY PAR"],
+["Kashichak SO", "805113", "KASHICHAK SO", "S", "KASHICHAK|DAULACHAK|MADHEPUR|BHAWANI BIGHA|PALI|CHANDINOAWAN|GAYATRI NAGAR|SAKARGANJ"],
+["Kashichak SO", "805113", "BAURI BO", "R", "BAURI|BHOJHMA|CHANPUR|JAGDISHPUR|LEMBUAPAR|KOSTHUA|TARAUNIYA|DARSHAN BIGHA|REWRA NURICHAK"],
+["Kashichak SO", "805113", "BIRNAWAN BO", "R", "BIRNAWAN|BHAUAAR|BAJRANG BIGHA|SHUMBHA DIH|HATIYARI|ORANI|JHOTA|UPRAMA|KUNDAN BIHGA|REHARI|BHAGALPUR|HARIDWAR BIGHA|JANGLI BIGHA"],
+["Kashichak SO", "805113", "BHATTA BO", "R", "BHATTA|TIHARI|DHANPUR|GONAR BIGHA|DIJIPAR|PHARPHAR|BOJHA"],
+["Kashichak SO", "805113", "SUBHANPUR BO", "R", "SUBHANPUR|THALPOSH|THALPOSH DIH|USARI"],
+["Kashichak SO", "805113", "BELAR BO", "R", "BELAR|KATURI BIGHA|MAHADEV BIGHA|ANAIPAR|MAHESHPUR|HANUMAN BIGHA"],
+["Kashichak SO", "805113", "DHERGAON BO", "R", "DHERGAON|NAYADIH|DURGAPUR|BABYPUR|RAGHUNATHPUR|SITACHAK|KESOPUR"],
+["Kashichak SO", "805113", "KHAKHARI BO", "R", "KHAKHARI|NEMCHAK|BHAIROBIGHA|DULARCHAK|LILABIGHA|BHAWANIPUR|MOHANPUR|KANDOPUR|KASHICHAK THANA"],
+["Orhanpur SO", "805123", "ORHANPUR SO", "S", "SINGHAUL|DEVKI BIGHA|PURNADIH|PATHRA HINGLISH|DILA HINGLIGH|ORHANPUR|HARICHANDAN BIGHA|AMAUNI|AAMIPUR|MADHOBIGHA"],
+["Orhanpur SO", "805123", "SABHRI BO", "R", "SABHRI|RAJAUR|MADHUPUR UTTARI TOLA|BHADOUR|PURNA BHADOUR|DAMODARPUR|KUNJHA|BHALUA|SIRPATIA|KASHIBIGHA|MADHBAN|MOTNAJE"],
+["Orhanpur SO", "805123", "BHADOKHARA BO", "R", "BHADOKHARA|JIBARI|PAHARPUR|GARHPAR|STEELNAGAR|GONI|SANDOHARA|KHEDU BIGHA|CHARNACHAK|AMARPUR|MUSHAHARI|PATHRA|NIRMALBIGHA|SALUGNAJ|BURMA|MELAYPUR"],
+["Orhanpur SO", "805123", "KENA SARAI BO", "R", "KENA|KHUTKA|KENASARAI|DEVIPUR|POKHARPAR|ROSTAMPUR|PAKHLAUTI|SUFAL BIGHA"],
+["Orhanpur SO", "805123", "SONSIHARI BO", "R", "SONSIHARI|MANJANPURA|BHURHA|CHAMARDIHA|LAXMI NAGAR|JAKI CHAK|TRILOKI BIGHA|SITARAMPUR|BINDA NAGAR|BELDHAR"],
+["Orhanpur SO", "805123", "ORAINA BO", "R", "ORAINA|GORDHOWA|SHAHPUR|NAHARPAR|KALIPUR|BELDARIYA|BHAROSA|RAMGARH|BALOKHAR|HARATI"],
+["Orhanpur SO", "805123", "AKAUNABAZAR BO", "R", "AKAUNA BAZAR|AKAUNA BELDARI|AKAUNADIH|DADAUR|KRISHNANAGAR|DHIRAJNAGAR|TETARIYA|AJLANG BIGHA|TETARIYA DIH|PURNADIH|PRANBIGHA|KENDUA|KENDUA BYPASS"],
+["Orhanpur SO", "805123", "PAKARIYA BO", "R", "PAKARIYA|GOPALPUR|TRILOKI BIGHA|ALIMA BIGHA|AMARPUR"],
+["Nimi SO", "811103", "NIMI SO", "S", "NIMI|SHEIKHOPUR SARAI|JODHAN BIGHA|SHEKHOPUR DIH"],
+["Nimi SO", "811103", "AMBARI BO", "R", "AMBARI"],
+["Nimi SO", "811103", "CHAKDIN BO", "R", "CHAKDIN|RAJABIGHA|KHAJLOUR BIGHA|SAKRAWAN"],
+["Nimi SO", "811103", "CHARUAWAN BO", "R", "CHARUAWAN|PREMCHANDRA BIGHA|DAROGI BIGHA|SUGIYA"],
+["Nimi SO", "811103", "JEANBIGHA BO", "R", "JEANBIGHA|KOSRA|PRABHUBIGHA|DANIBIGHA|KHAKRA|SADIKPUR|BHADELI|BAIKHATHA|GOPICHAK|MIYANBIGHA|BADHEBIGHA|GANGTI"],
+["Nimi SO", "811103", "PAHARIYA BO", "R", "PAHARIYA"],
+["Nimi SO", "811103", "PANCHI BO", "R", "PANCHI|MAHANANDPUR|MIRBIGHA|RAINCHA|KABIRPUR|KAILASHNAGAR|NIRPUR"],
+["Nimi SO", "811103", "PANHESA BO", "R", "PANHESA|MAHBATPUR|MOHSIMPUR|KHURIYA|DULARUABIGHA"],
+["Nimi SO", "811103", "UGABAN BO", "R", "UGABAN|LAKHNUBIGHA|FIROZPUR|MAHANANDPUR|CHAKPAR"],
+["Mehus SO", "811102", "MEHUS SO", "S", "MEHUS|NAWADA|MANIYARI|RAMNABIGHA|LAXMIPUR"],
+["Mehus SO", "811102", "ESUWA BO", "R", "ESUWA|BELDARIYA|ORAIYA|PURANA ESUWA"],
+["Mehus SO", "811102", "GAGAUR BO", "R", "GAGAUR|KORMA|JAGDISHPUR"],
+["Mehus SO", "811102", "KATARI BO", "R", "KATARI|MURARPUR|KURASGANJ"],
+["Mehus SO", "811102", "MAFO BO", "R", "MAFO|RAMGARH|BELAURI|SAHRA|GURERA"],
+["Mehus SO", "811102", "SASAUR BO", "R", "SASAUR|MANACHAK|SAMASTIPUR|FARIDPUR|DHARAMPUR"],
+["Mehus SO", "811102", "SINGHAUL BO", "R", "SINGHAUL|GOVACHAK|KAZICHAK"],
+["Barbigha SO", "811101", "BARBGIHA SO", "S", "SHIVPURI|SHIVPURI GANGACHAK|PURANI SAHAR|MAHUATAL|BULLACHAK|GOBAR TOLI|SANTOSHI MATA|FAIZABAD|RAVIDAS TOLA|SHIVAJI NAGAR|DHOBI TOLA|THAKANIYA POKHAR|DINKAR NAGAR|KRISHNA NAGAR|NIRPUR NAGAR|SKR COLLEGE|PURANI SAHAR PANI TANKI|GANJPAR|MAIN ROAD|GOLAPAR|CHANDU KUAN|SAMACHAK|DAGARPAR|VISHWAKARMA NAGAR|KHARJAMMA|NASIBCHAK|BRAHMAN TOLA|GAUSHALA ROAD|MAHADEV GANJ|MAHALLAPAR|JHANDA CHOWK|MAHURI TOLA|BULLACHAK DAK STHAN|MISHAN CHOWK|SHANTI NAGAR|HARGAWAN|BEDAULI|MURGIACHAK|ALINAGAR|MAHAVIR NAGAR|R LAL COLLEGE|SAKALDEV NAGAR|KHETALPURA|NEW AREA|PARSOBIGHA|KOYRIBIGHA|NARAYANPUR|PUNESARA|SARAIYA|TETARPUR|SHERPAR|ANAND NAGAR|NEW BYPASS|BIJLI OFFICE|PANI TANKI|HANUMAN NAGAR"],
+["Barbigha SO", "811101", "ASTHANA BO", "R", "ASTHANA|MAKSIDPUR|QUAMISPUR|KHORAMPUR|HUSAINICHAK|KUTTUBCHAK"],
+["Barbigha SO", "811101", "TEUS BO", "R", "TEUS|JAYRAMPUR|BADHANPURA|MADARICHAK|KANHAULI|DHAMAUL|KASHIBIGHA|MOTIBIGHA|UKHANDI|BHANPURA"],
+["Barbigha SO", "811101", "BABHANBIGHA BO", "R", "BABHANBIGHA|NAUROJPUR|KHOJAGACHHI|RAJAURA|BISHANPUR"],
+["Barbigha SO", "811101", "MALDAH BO", "R", "MALDAH|BADI ISMAILPUR|CHHOTA ISMAILPUR|NAGDIH|FEDALIBIGHA|NARESHPUR|BELDARIYA"],
+["Barbigha SO", "811101", "BELAO BO", "R", "BELAO|MADHEPUR|BIRPUR|HAIDARCHAK|CHHABILATHIKA|KEVALBIGHA|KRISHNANAGAR|AZADNAGAR|KSHEMA"],
+["Barbigha SO", "811101", "KUTAUTH BO", "R", "KUTHAUTH|AHIYAPUR|DHARSENI"],
+["Barbigha SO", "811101", "KISHANPUR BO", "R", "KISHANPUR|AHADAPAN MUSAHARI|CHANDNAGAR"],
+["Barbigha SO", "811101", "IBRAHIMPUR BO", "R", "IBRAHIMPUR|NANAUR|KHANPUR|CHHOTI GARIYARI|MAHMADPUR|POJ"],
+["Barbigha SO", "811101", "RAMPUR SINDAY BO", "R", "RAMPUR|SINDAY|CHANDRAVANSHI NAGAR"],
+["Barbigha SO", "811101", "MAUR BO", "R", "MAUR|NASRATPUR|GANGTI|DELHWA|KARMANCHAK|RAMNAGAR"],
+["Barbigha SO", "811101", "SAMAS BO", "R", "SAMAS BUJURG|KOLHARA BIGHA|BALWAPAR|SAMAS KHURD"],
+["Barbigha SO", "811101", "RAMJANPUR BO", "R", "AKBARBIGHA|RAMJANPUR|GOURBIGHA"],
+["Barbigha SO", "811101", "SARBA BO", "R", "SARBA|MIRJAPUR|JAMALPUR|LALUNAGAR"],
+["Barbigha SO", "811101", "TOYGARH BO", "R", "TOYGARH|JAGDISHPUR"],
+["Barbigha SO", "811101", "KAJIFATUCHAK BO", "R", "KAJIFATUCHAK|CHHOTI MUSAPUR|BADI MUSAPUR|POLHAPAR|LAKSHMIPUR|BAIDYANATHPUR|MILKICHAK|KABILGANJ"],
+["Barbigha SO", "811101", "KEWTI BO", "R", "KEWTI|DIH|NARAYANPUR GARH|NEMCHAND BIGHA|BELDARIYA|MAKANPUR|PANK"],
+["Barbigha SO", "811101", "GILANI BO", "R", "GILANI|SIRSA|AMBABIGHA|NARSINGHPUR|MAHAVIRPUR"],
+["Barbigha SO", "811101", "AMAMA BO", "R", "AMAMA|MANPUR"],
+["Barbigha SO", "811101", "SADARPUR BO", "R", "SADARPUR|LODIPUR|JAKHAUR|GOVINDAPUR|CHATARBIGHA"],
+["Barbigha SO", "811101", "DHANUKI BO", "R", "DHANUKI|RUPASPURA|KABIRPURA"],
+["Barbigha SO", "811101", "MALAWA BO", "R", "MALAWA|JAHANA|BADI GHARIYARI"],
+["Barbigha SO", "811101", "MOHINI BO", "R", "MOHINI|JANGIPUR|AZADNAGAR"],
+["Barbigha SO", "811101", "SUBHANPUR BO", "R", "SUBHANPUR|JAGJEEVANPUR|FATECHAK|BHANPURA|MUSHARI|KALYANPUR"],
+["Barbigha SO", "811101", "K MILKI CHAK BO", "R", "KHALILCHAK|MALILCHAK|DARIYACHAK|DAYANANCHAK|BHAVCHAK"],
+["Barbigha SO", "811101", "ONAMA BO", "R", "ONAMA|DOVADIH|SITARAMPUR|CHAMARBIGHA|PANAYPUR|LAKSHMIPUR"],
+["Barbigha SO", "811101", "KENARKALAN BO", "R", "KENARKALAN|CHHOTI KENAR|SEKHRA|SEKHRA BIGHA|SHERPUR DUMRA|GAUS NAGAR|MANACHAK"],
+["Barbigha SO", "811101", "C R BARBIGHA BO", "R", "C R BARBIGHA"],
+["Chewara SO", "811304", "CHEWARA SO", "S", "CHEWARA|SIJHORI|CHINTAMANCHAKE|MAHESHPUR|BAHAURA|TIYA|SARWANBIGHA|RANKAR|BASANT|PINDSARIF|ANDOLI"],
+["Chewara SO", "811304", "AKARHA BO", "R", "AKARHA|AKRAIN|ETARHA|KEWALI"],
+["Chewara SO", "811304", "ASTHWAMA BO", "R", "ASTHWAMA|LAHANA|BEKHANAI|HANSHAPUR|BENIGUNJ"],
+["Chewara SO", "811304", "BAHACHHA BO", "R", "BAHACHHA|SIRKHINDI|KUSUMTAR|BENGUCHA|BACHHIYA BIGHA"],
+["Chewara SO", "811304", "CHAKANDRA BO", "R", "CHAKANDRA|BARARI BIGHA|BARARI BIGHA MANAY|KUSHOKHAR|RAJOPUR|GAUDHUA"],
+["Chewara SO", "811304", "CHATHIYARA BO", "R", "CHATHIYARA|LAUTOT|MASADHI|BELDARI"],
+["Chewara SO", "811304", "CHORDARGHA BO", "R", "CHORDARGHA|KUNDA|FAITHAPUR|AKBARPUR|FULCHOR|AFARDIH|DAUTHPUR ITAWA"],
+["Chewara SO", "811304", "EKRAMA BO", "R", "EKRAMA|ANGPUR|RAJOURA|BELKHUNDI"],
+["Chewara SO", "811304", "GAGARI BO", "R", "GAGARI|GHUNESHA|RUDASI"],
+["Chewara SO", "811304", "HAUSARI BO", "R", "HAUSARI|SULTANPUR|AKUNA"],
+["Chewara SO", "811304", "KARANDAY BO", "R", "KARANDAY|KAPASI|DHAMSENA|GHARI|JAYNAJAR|HARAYANPUR"],
+["Chewara SO", "811304", "LOHAN BO", "R", "LOHAN|CHATTAYANI|BANSIPUR|BAHALUA|GAGAURA|AURARA|ARARI"],
+["Chewara SO", "811304", "SHODI BO", "R", "SHODI|GODHA|KAMALPUR|MAHULI|SHODHI BHALAUA"],
+["Warisaliganj SO", "805130", "WARISALIGANJ SO", "S", "WARISALIGANJ|MASUDA|CHAINPURA|MUDDALCHAK|MAIN CHOWK|SABZI MARKET|PURANI BANK ROAD|PHULWARI GALI|AMBEDKAR NAGAR|MUSAHRI GALI|NATHI GALI|BADHI TOLA|UTTAR BAZAR|KOYRI TOLA|DEVI STHAN|SANGATPAR|SONAR TOLI GALI|STATION ROAD|SIMRI BIGHA|SIMRI DIH|HIRMA BIGHA|MAFI|VIJAY NAGAR|KRISHNA PURI|GUMATI ROAD|THANA CHOWK|NULACHAK|DARIYAPUR ROAD|CHANDAN SINGH CHOWK|MULLACHAK DIH|SAFIGANJ|MASUDA|KAMALIAMIL|PATEL NAGAR|KHANAPUR|MARICHAK|KORMA|TATI MIRBIGHA|SAMICHAK|BALWAPAR|SHERPUR MORH"],
+["Warisaliganj SO", "805130", "PAINGARI BO", "R", "PAINGARI|GODAPAR|BELDARIYA"],
+["Warisaliganj SO", "805130", "DARIYAPUR BO", "R", "DARIYAPUR PASCHIMI|DARIYAPUR BICHLI|SHEKHPURBA|KISHANGANJ|BASOCHAK|NAYA MUSHAHARI"],
+["Warisaliganj SO", "805130", "CHAKWAI BO", "R", "CHAKWAI|BALWAPAR|MIRBIGHA|GOSPUR|SONBARSA"],
+["Warisaliganj SO", "805130", "MAKANPUR BO", "R", "MAKANPUR|CHANDIPUR|LAKSHMIPUR|SULTANPUR|LILABIGHA|GOPALPUR"],
+["Warisaliganj SO", "805130", "KOCHGAON BO", "R", "KOCHGAON|LALPURA|NAYANAGAR|DOBAMNAGAR|JAYANTNAGAR|KANDHA|SODHIPUR"],
+["Warisaliganj SO", "805130", "MILKI BO", "R", "MILKI|HAJIPUR|GARERI BIGHA|MURAR BIGHA"],
+["Warisaliganj SO", "805130", "MOSAMA BO", "R", "MOSAMA|MIRCHAK|BELDHA|GARUA|BHAGALPUR|KASHI BIGHA|BEJRAJPUR"],
+["Warisaliganj SO", "805130", "BELARI BO", "R", "BELARI|KAMALBIGHA|SAIDPUR|TARABIGHA"],
+["Warisaliganj SO", "805130", "MANJAUR BO", "R", "MANJAUR|KOLHABIGHA|TELIYAMILKI|CHULHAY BIGHA|MAY|KEVALBIGHA|BARANPUR BELDA|BALBAPAR"],
+["Warisaliganj SO", "805130", "SAMBEY BO", "R", "SAMBEY|SHERPUR|CHIRAIYA BALLOPUR|DHANBIGHA|GAMBHIRPUR|NAGPUR|VISHANPUR"],
+["Warisaliganj SO", "805130", "JALALPUR BO", "R", "JALALPUR|SARKATTI|THERA SARAI|NATTU BIGHA|MAHESHPUR|AZAMPUR|CHANDRASEKHAR NAGAR|RASALPUR|MAHADEVBIGHA|PADIPUR|BHAGWATPUR"],
+["Warisaliganj SO", "805130", "KATAUNA BO", "R", "KATAUNA|PALATPUR|GANGAPUR|LOHRAJPUR|RAJPUR|NAKTISARAI|CHHACHHUBIGHA|BHAIDI|PARMANANDPUR"],
+["Warisaliganj SO", "805130", "NAROMURAR BO", "R", "NAROMURAR|KHIRBHOJNA|SHANKAR BIGHA"],
+["Warisaliganj SO", "805130", "MOHIUDDINPUR BO", "R", "MOHIUDDINPUR|NAKTISARAI|JHAUR|NAJAYGARH"],
+["Warisaliganj SO", "805130", "KUTRI BO", "R", "KUTRI|TULLAPUR|SHIVGANJ|MASANKHAWAN"],
+["Dhamoul SO", "805101", "DHAMOUL SO", "S", "DHAMOUL|TURUKBAN|PARARIYA|SHYAMDEV|REWAR|REHARI|DHONRHA|DULARPUR|BELABAD|LAXMIPUR|DUDHAILA|BELKHUNDA|BIJUBIGHA|BHOJPUR|JOGIBIGHA"],
+["Dhamoul SO", "805101", "BARASOLAPUR BO", "R", "BARA|SOLAHPUR|TAJPUR|DIHRI"],
+["Dhamoul SO", "805101", "DHANAR BO", "R", "DHANAR|MAHATPUR|NIJAY|ANJUNAR|PURNADIH|TELAR"],
+["Dhamoul SO", "805101", "DHARHARA BO", "R", "DHARHARA|DURGAPUR|JASAT"],
+["Sheikhpura SO", "811105", "SHEIKHPURA SO", "S", "KHANDPAR|KATRA CHOWK|MAKDUMPUR|JAKHRAJSTHAN|KACHHI ROAD SHEIKHPURA|JAMALPUR BIGHA|CHANDNI CHOWK|MARPASAUNA|BENGALI PAR|CHAKDIWAN|BUDHAULI|AHIYAPUR|GIRINDA|COLLEGE ROAD|BUDHAULI BAZAR|MAHADEV NAGAR|TRANSPORT AREA|SDO OFFICE|DM OFFICE|KAMASI|TINMUHANI|MEHUS MORE|MAHARANI PURAM|SHEIKHPURA BYPASS|POLICE LINE"],
+["Sheikhpura SO", "811105", "ABGIL CHANDEY", "B", "ABGIL CHANDEY|CHAK PANDEY|ABGIL MUSAHRI"],
+["Sheikhpura SO", "811105", "AIFANI", "B", "AIFANI|MONIPUR|BAYBIGHA|CHAKMUNDRI|FAIDPUR|DULLAPUR|GOSAYMARHI."],
+["Sheikhpura SO", "811105", "AUDHEY", "B", "AUDHEY|NEMDARGANJ|CHAKMUNDRI|FARIDPUR|DULLAPUR|GOSAYMARHI"],
+["Sheikhpura SO", "811105", "BELCHHI", "B", "BELCHHI|MILKI|MANKAUL BELCHHI DIH"],
+["Sheikhpura SO", "811105", "BHOJDIH", "B", "BHOJDIH|DEOPURI|JAKHAUR|DHANAUL|SAHANURA DHANKAUL"],
+["Sheikhpura SO", "811105", "BIMAN", "B", "BIMAN|CHAWANIYA MOHSONA|TEJABIGHA|DOLHAR|BAITAHPUR|BOGOHI|MAHAWAT|HARDAYALPUR|PATHALITIYA"],
+["Sheikhpura SO", "811105", "BRINDAWAN", "B", "HAZRATPURA MANDOOR|CHANDI BRINDAWAN|LAXMIPUR|DHARAMPUR|KAMALBIGHA|LATKANA BISHANPUR|BANDOPUR"],
+["Sheikhpura SO", "811105", "CHORBAR", "B", "BARWIYABIGHA|TANPURA|DHARSI|BARUNA|BARUNI|DHARSI|SUMKA|PIPRAPOKHAR MADHA|JANGLIBIGHA|JEKHAURBIGHA"],
+["Sheikhpura SO", "811105", "D.LODIPUR", "B", "D.LODIPUR|DHOUSA"],
+["Sheikhpura SO", "811105", "DEOLEY", "B", "DEOLEY|BANK|BANKARPUR|DILDARNAGAR|DEOLEYBIGHA"],
+["Sheikhpura SO", "811105", "DIHA", "B", "DIHA|KEMRA JODHANBIGHA|SALDNAGRI"],
+["Sheikhpura SO", "811105", "GAWAY", "B", "GAWAY|KHALASPUR|SARMAIDAN"],
+["Sheikhpura SO", "811105", "HATHIYAWAN", "B", "HATHIYAWAN|RASALPUR"],
+["Sheikhpura SO", "811105", "HUSSSAINBAD", "B", "HUSSAINABAD|BIDYAPUR|PANHAR"],
+["Sheikhpura SO", "811105", "PURANKAMA", "B", "PURNKAMA|DHARAMPUR|KAMLA"],
+["Sheikhpura SO", "811105", "KAREY", "B", "BAZIDPUR|SUDASPUR|KARHIO|DARWESPUR|LACHNA|PASHLAPHAR.MATOKHAR"],
+["Sheikhpura SO", "811105", "KARKI", "B", "KARKI|MULANAGAR|USARI|RAUNDI|TORALBIGHA|LALUBIGHA|RNAKA"],
+["Sheikhpura SO", "811105", "KASAR", "B", "KASAR|KARIMABIDH|CHAKABGIL.|KHETA|BELHARI"],
+["Sheikhpura SO", "811105", "KUSHERDHI", "B", "KUSHERDHI MANMADA|DUMARI BHADARTHI"],
+["Sheikhpura SO", "811105", "KUSUMBHA", "B", "AMANTPUR|BARIYABIGHA|KRIPA BIDHA|VIJAYNAGAR|BELDAHI|BADAIYA KUSUMBHA"],
+["Sheikhpura SO", "811105", "LODIPUR", "B", "LODIPUR|SARIKA"],
+["Sheikhpura SO", "811105", "MANDANA", "B", "MANDNA|BHIKAURPUR.BADSHAPUR|BINTA"],
+["Sheikhpura SO", "811105", "MANIYANDA", "B", "MAIYANDA|BIGHA|EKSARI KAMALGHAR|PAIGAMBRPUR"],
+["Sheikhpura SO", "811105", "MASHOURDHA", "B", "GAGANPUR|RAGHUNATHPUR|ISHANAGAR|DHANNUTOLA"],
+["Sheikhpura SO", "811105", "MUBARKPUR", "B", "MUBARKPUR|AIJHI"],
+["Sheikhpura SO", "811105", "NAVINAGAR KAKRAR", "B", "NAVINAGAR KAKRAR"],
+["Sheikhpura SO", "811105", "PAIN", "B", "PAIN|DIHRI|FIRAUGIBIGHA|PAITHRAITA"],
+["Sheikhpura SO", "811105", "PATHRAITA", "B", "CHHADERI|KATNIKOL|JAMDOBA|KHORAMPUR|KUNDA|BARUAI|PURAINI|CHUNNIPUR"],
+["Sheikhpura SO", "811105", "PHARPAR", "B", "PHARPAR ARIYARI|RAMPUR|PHARPAR MUSAHARI"],
+["Sheikhpura SO", "811105", "PINJARI", "B", "PINJARI|PIJRIBIGHA|JANGIPUR"],
+["Sheikhpura SO", "811105", "GHUSKURI", "B", "GHUSKURI|SASBAHANA|MAHUET BARSA DATUARA|BALRAMBIGHA"],
+["Sheikhpura SO", "811105", "SANAIYA", "B", "TARAPAR|PATHRITHA|TELIDIH|BISAHIYA|SALEMPUR|NAIKADIH|MAY|AMARPUR"],
+["Munger HO", "811201", "Munger Beat", "B", ""],
+["Basudeopur SO", "811202", "Basudeopur SO", "S", ""],
+["Basudeopur SO", "811202", "Baha Chowki BO", "R", ""],
+["Basudeopur SO", "811202", "Shiv Kund BO", "R", ""],
+["Basudeopur SO", "811202", "Singhia BO", "R", ""],
+["Basudeopur SO", "811202", "Farda BO", "R", ""],
+["Basudeopur SO", "811202", "Zamin Degree BO", "R", ""],
+["Basudeopur SO", "811202", "Heru Diyara BO", "R", ""],
+["Basudeopur SO", "811202", "J Nagar BO", "R", ""],
+["Basudeopur SO", "811202", "Bank Harpur BO", "R", ""],
+["Basudeopur SO", "811202", "Kutlupur BO", "R", ""],
+["Basudeopur SO", "811202", "Tikarampur BO", "R", ""],
+["Basudeopur SO", "811202", "Benigir BO", "R", ""],
+["Basudeopur SO", "811202", "Shankarpur BO", "R", ""],
+["Basudeopur SO", "811202", "Taufir BO", "R", ""],
+["Basudeopur SO", "811202", "Dariyapur BO", "R", ""],
+["Basudeopur SO", "811202", "Mathar BO", "R", ""],
+["Basudeopur SO", "811202", "B M Tola BO", "R", ""],
+["Bariarpur SO", "811211", "Bariarpur SO Beat", "B", ""],
+["Bariarpur SO", "811211", "Agrahan BO", "R", ""],
+["Bariarpur SO", "811211", "Bhadaura BO", "R", ""],
+["Bariarpur SO", "811211", "Binda Diyara BO", "R", ""],
+["Bariarpur SO", "811211", "Ekashi BO", "R", ""],
+["Bariarpur SO", "811211", "Ganganiya BO", "R", ""],
+["Bariarpur SO", "811211", "Ghorghat BO", "R", ""],
+["Bariarpur SO", "811211", "Jankinagar BO", "R", ""],
+["Bariarpur SO", "811211", "K shampur BO", "R", ""],
+["Bariarpur SO", "811211", "Kalarampur BO", "R", ""],
+["Bariarpur SO", "811211", "Kalyanpur BO", "R", ""],
+["Bariarpur SO", "811211", "Kharia BO", "R", ""],
+["Bariarpur SO", "811211", "Lohchi BO", "R", ""],
+["Bariarpur SO", "811211", "Maheshpur BO", "R", ""],
+["Bariarpur SO", "811211", "Nawagarhi BO", "R", ""],
+["Bariarpur SO", "811211", "Purshotampur BO", "R", ""],
+["Bariarpur SO", "811211", "Ratanpur BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Haweli Kharagpur", "B", ""],
+["Haweli Kharagpur SO", "811213", "Banhara BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Barhauna BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Bichhichanchar BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "DARIAPUR bo", "R", ""],
+["Haweli Kharagpur SO", "811213", "Gangata More BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Gaurab Dih BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Gobadda BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Kendua BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Khaira BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Khaira Doray BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "L Laxmipur BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Lagma BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Manjhgay BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Muzaffarganj BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Parsando BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "R Cmaidan BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Raja Dih BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Ramankabad BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Rathaitha BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Sadobh BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Shivpur Logain BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Teghara BO", "R", ""],
+["Haweli Kharagpur SO", "811213", "Tetia Bambar BO", "R", ""],
+["Jamalpur MDG SO", "811214", "Jamalpur MDG", "S", ""],
+["Jamalpur MDG SO", "811214", "Halimpur BO", "R", ""],
+["Jamalpur MDG SO", "811214", "Ithari BO", "R", ""],
+["Jamalpur MDG SO", "811214", "Jamalpur WS", "S", ""],
+["Jamalpur MDG SO", "811214", "Pattam BO", "R", ""],
+["Jamalpur MDG SO", "811214", "Safiabad BO", "R", ""],
+["Jamalpur MDG SO", "811214", "Sarobagh BO", "R", ""],
+["Surajagrha SO", "811106", "Suarajgarha SO", "S", ""],
+["Surajagrha SO", "811106", "Akbarpur BO - 811106", "R", ""],
+["Surajagrha SO", "811106", "Alinagar BO", "R", ""],
+["Surajagrha SO", "811106", "Amarpur BO", "R", ""],
+["Surajagrha SO", "811106", "Bijulia BO", "R", ""],
+["Surajagrha SO", "811106", "Dighari BO", "R", ""],
+["Surajagrha SO", "811106", "K T Laxmipur BO", "R", ""],
+["Surajagrha SO", "811106", "Kiranpur BO", "R", ""],
+["Surajagrha SO", "811106", "Mustafapur BO", "R", ""],
+["Surajagrha SO", "811106", "Nandpur BO", "R", ""],
+["Surajagrha SO", "811106", "Paharpur BO", "R", ""],
+["Surajagrha SO", "811106", "Sonbarsha BO", "R", ""],
+["Surajagrha SO", "811106", "Saidpura BO", "R", ""],
+["Surajagrha SO", "811106", "Shamho BO", "R", ""],
+["Surajagrha SO", "811106", "Ss barari BO", "R", ""],
+["Kajra SO", "811309", "Kajra so", "S", ""],
+["Kajra SO", "811309", "Aram BO", "R", ""],
+["Kajra SO", "811309", "Lai BO", "R", ""],
+["Kajra SO", "811309", "Pawai BO", "R", ""],
+["Kajra SO", "811309", "Pokhrama BO", "R", ""],
+["Kajra SO", "811309", "Sri Kishun BO", "R", ""],
+["Kajra SO", "811309", "Urain BO", "R", ""],
+["Piri Bazar SO", "811112", "Piri bazar so", "S", ""],
+["Piri Bazar SO", "811112", "Abhaypur BO", "R", ""],
+["Piri Bazar SO", "811112", "Loshghani BO", "R", ""],
+["Dharhara SO", "811212", "Dharahara SO", "S", ""],
+["Dharhara SO", "811212", "Amari BO", "R", ""],
+["Dharhara SO", "811212", "Barmasia BO", "R", ""],
+["Dharhara SO", "811212", "Bhalar BO", "R", ""],
+["Dharhara SO", "811212", "Itwa BO", "R", ""],
+["Dharhara SO", "811212", "Lahauta Ghatwari BO", "R", ""],
+["Dharhara SO", "811212", "Mehgana BO", "R", ""],
+["Dharhara SO", "811212", "Mangarh BO", "R", ""],
+["Dharhara SO", "811212", "Orabagicha BO", "R", ""],
+["Dharhara SO", "811212", "Tola Bangalwa BO", "R", ""],
+["Dharhara SO", "811212", "Tola paisra BO", "R", ""],
+["Kiul RS SO", "811310", "Kiul RS", "B", ""],
+["Kiul RS SO", "811310", "Bannu Bagicha BO", "R", ""],
+["Kiul RS SO", "811310", "Baskund BO", "R", ""],
+["Kiul RS SO", "811310", "Bichhwey BO", "R", ""],
+["Kiul RS SO", "811310", "Gopalpur BO", "R", ""],
+["Kiul RS SO", "811310", "Janki Dih Beldaria BO", "R", ""],
+["Kiul RS SO", "811310", "Malia BO", "R", ""],
+["Kiul RS SO", "811310", "Mananpur BO", "R", ""],
+["Kiul RS SO", "811310", "Mano BO", "R", ""],
+["Kiul RS SO", "811310", "Rampur BO", "R", ""],
+["Kiul RS SO", "811310", "Sahoor BO", "R", ""],
+["Kiul RS SO", "811310", "Sangrampur BO", "R", ""],
+["Kiul RS SO", "811310", "Shobhani BO", "R", ""],
+["Kiul RS SO", "811310", "Singhchak BO", "R", ""],
+["Lakhisarai SO", "811311", "Lakhisarai SO", "S", ""],
+["Lakhisarai SO", "811311", "Aurey BO", "R", ""],
+["Lakhisarai SO", "811311", "Balgudar BO", "R", ""],
+["Lakhisarai SO", "811311", "Belari BO", "R", ""],
+["Lakhisarai SO", "811311", "Bhabangama BO", "R", ""],
+["Lakhisarai SO", "811311", "Damodarpur BO", "R", ""],
+["Lakhisarai SO", "811311", "Dhiradar BO", "R", ""],
+["Lakhisarai SO", "811311", "Dhira BO", "R", ""],
+["Lakhisarai SO", "811311", "Kisanpur BO", "R", ""],
+["Lakhisarai SO", "811311", "Mahisona BO", "R", ""],
+["Lakhisarai SO", "811311", "Manjhway BO", "R", ""],
+["Lakhisarai SO", "811311", "Mankattha BO", "R", ""],
+["Lakhisarai SO", "811311", "Mohanpur BO", "R", ""],
+["Lakhisarai SO", "811311", "Nandnama BO", "R", ""],
+["Lakhisarai SO", "811311", "Pacham BO", "R", ""],
+["Lakhisarai SO", "811311", "Parsama BO", "R", ""],
+["Lakhisarai SO", "811311", "Rahatpur BO", "R", ""],
+["Lakhisarai SO", "811311", "Ramachandrapur BO", "R", ""],
+["Lakhisarai SO", "811311", "Ramgarh BO", "R", ""],
+["Lakhisarai SO", "811311", "Ramnagar BO", "R", ""],
+["Lakhisarai SO", "811311", "Rehua BO", "R", ""],
+["Lakhisarai SO", "811311", "S khairma BO", "R", ""],
+["Lakhisarai SO", "811311", "Sharma BO", "R", ""],
+["Lakhisarai SO", "811311", "Terarhat BO", "R", ""],
+["Lakhisarai SO", "811311", "Walipur BO", "R", ""],
+["Halsi SO", "811306", "Halsi SO", "S", ""],
+["Halsi SO", "811306", "Baghaur BO", "R", ""],
+["Halsi SO", "811306", "G Parsando BO", "R", ""],
+["Halsi SO", "811306", "Kendi BO", "R", ""],
+["Halsi SO", "811306", "Konag Bo", "R", ""],
+["Halsi SO", "811306", "S salaunja BO", "R", ""],
+["Halsi SO", "811306", "Shiovsona BO or Shivsona BO", "R", ""],
+["Mallehpur SO", "811313", "Mallehpur SO", "S", "Mallehpur|Trust Colony|Kairibank|Nagdeva|Tenghara|Banjhipyar|Bhaluka|Narsotta"],
+["Mallehpur SO", "811313", "Agahara Barubatta BO", "R", "Agahra|Barbutta|Sahur|Uteriya|ugnichak|Singhochak|Khargor|Khairi|Rampur|Chakpiri|Islamnagar|Lagma Jamuniyatand|Nardi|Shahpur|Bhatchak|Jhakhua|Lohra Bagicha"],
+["Mallehpur SO", "811313", "Amrath BO", "R", "Amrath|Sira Nawada|Beldariya|Murgichak|Mishirbigha|Bhagwanna"],
+["Mallehpur SO", "811313", "Arsar BO", "R", "Adsar|Kachahri|Chhitma|Ganesh Nawada|Ekeriya"],
+["Mallehpur SO", "811313", "Barahat BO", "R", "Barahat|Bhirkauwa|Salaiya|Dowathiya|Tamkuliya|Kusauna"],
+["Mallehpur SO", "811313", "Bariarpur BO", "R", "Bariyarpur|Mohanpur|Devachak|Patauna|Karman|Pachrukhi|Karikol"],
+["Mallehpur SO", "811313", "Bukar BO", "R", "Bukar|Gadi Bukar|Nawkadih|Kanaulitand|Belatand|Gorwajot"],
+["Mallehpur SO", "811313", "Chaura BO", "R", "Choura|Paharpur|Thegua|Kundhur|Harnarayanpur"],
+["Mallehpur SO", "811313", "Darha BO", "R", "Darha|Sudamapur|Dhunimamaran|Pahditar|Kuriyabadar|Tapowan|Tetariya|Sukhlewa|Nauwamaran|Lathlath"],
+["Mallehpur SO", "811313", "Daulatpur BO", "R", "Daulatpur|Dighoi|Sarari|Rajpur|Kaitha Musahri"],
+["Mallehpur SO", "811313", "Dhadhaur BO", "R", "Dhadhaur|Charan|Balwadih|Shardawad|Charan Mushahri"],
+["Mallehpur SO", "811313", "dhandh BO", "R", "Dhandh|Pratappur|Sahidganj|Itwa|Batandih"],
+["Mallehpur SO", "811313", "Gurmaha BO", "R", "Gurmaha|Musahritand|Kuantari|Bichla Tola|Chormara|Jamuniyatand|Barmasia|Narakol|Paisraha"],
+["Mallehpur SO", "811313", "Itasagar BO", "R", "Itasagar|Ramsagar|Dhamna Musahri|Bhagalpur Musahri"],
+["Mallehpur SO", "811313", "Kakan BO", "R", "Kakan|Tilakpur|Deori|Beldariya|Chhattudhanwa|Lakhandhanwa"],
+["Mallehpur SO", "811313", "Katauna BO", "R", "Katauna|Garwakatauna|Gadikatauna|Bhandari|Bichla Katauna|Tandpar|Bagich Katauna"],
+["Mallehpur SO", "811313", "Khadigram BO", "R", "Khadigram|Garoni|Dhobni|Bhurkura|Paisraha|Bangawan|Rajaghat|Bhagalpura|Lalmatiya|Dhirendrapuri|Kajiyajod"],
+["Mallehpur SO", "811313", "Kharsari BO", "R", "Kharsari|Mahugain|Chanwara|Sitaraampur|Pyarepur"],
+["Mallehpur SO", "811313", "Kolhua BO", "R", "Kolhua|Kewal|Phulwariya|Jawatari|Penghi|Pacheshri|Adhra|Tatka"],
+["Mallehpur SO", "811313", "Konan BO", "R", "Konan|Bhandari|Narayanpur"],
+["Mallehpur SO", "811313", "Lohra BO", "R", "Lohra|Islamnagar|Lukhuri"],
+["Mallehpur SO", "811313", "Mahadeo simaria BO", "R", "Mahadeo Simaria|Ranhan|Dhanway|Roushandih"],
+["Mallehpur SO", "811313", "Maniyadda BO", "R", "Maniadda|Bhajour|Nim Nawada|Amba|Mishir Maniadda|Bikrampur Simariya"],
+["Mallehpur SO", "811313", "Numar BO", "R", "Numar|Nasrichak|Khatta|Vijaynagar|Labhet|Bhandra|Premnagar|Tilakpur"],
+["Mallehpur SO", "811313", "Pathak Chack BO", "R", "Pathakchak|Mircha|Basaiya|Rajadih|Korasi|Shivdih"],
+["Mallehpur SO", "811313", "Sankurha BO", "R", "Sankurha|Bhrain|Kundari|Harla|Chandwara|Gulhaita|Gangti|Sonaimadwa|Balthara"],
+["Khaira SO", "811317", "Khaira SO", "S", "Khaira Bazar|Charghara|Patel Nagar|Subhash Nagar|Purna Khaira|Tilakpur|Dhab Kashmir|Ghatbari"],
+["Khaira SO", "811317", "Amari BO", "R", "Amari|Bithalpur|Suraundha|Noniyatand|Khutauna"],
+["Khaira SO", "811317", "Arnawabank BO", "R", "Arnawabank|Jathar|Darima|Karkatti"],
+["Khaira SO", "811317", "Barabandh BO", "R", "Barabandh|Beldari|Jorwaha|Sijuatand|Bhojpur|Dayaldih|Dengarwa"],
+["Khaira SO", "811317", "Baribag BO", "R", "Baribag|Fatehpur|Jhitti|Bhalni|Ambatari|Jaljoga|Pipratand|Chandrapura|Nawkadih"],
+["Khaira SO", "811317", "Bela BO", "R", "Bela|Manpur|Harpeti|Tetariya"],
+["Khaira SO", "811317", "Bhimain BO", "R", "Bhimain|Keliadih|Kurao|Bhalni|Chaukitand"],
+["Khaira SO", "811317", "Bhour BO", "R", "Bhour|Parsa|Ghanberiya|Bajpedih|Gosaindih|Pakdi|Hariyadih|Blokbathan|Pachrukhi"],
+["Khaira SO", "811317", "Chanashly BO", "R", "Chandrasheli|Korba|Umantari|Bheriyatili|Ghatwari"],
+["Khaira SO", "811317", "Choudiha BO", "R", "Chaudiha|Aamin|Padmawat|Ekeriya"],
+["Khaira SO", "811317", "Dumarkola BO", "R", "Dumarkola|Dharampur|Mahapur|Abhaypur|Kharui|Bariyarpur|Milki|Pyarepur|Thekhi"],
+["Khaira SO", "811317", "dundu BO", "R", "Dundo|Pira|Taradih|Narwada|Milki"],
+["Khaira SO", "811317", "Gadibishanpur BO", "R", "Gadibishanpur|Kurwatand|Laldaiya|Utapathhar|Nainijor|Ranganiya|Ektarwa|Bagandar|Dumro|Karkatti|Ketaribank"],
+["Khaira SO", "811317", "Garhi BO", "R", "Nimatand|Parasi|Badildih|Dewlatand|Baiddih|Nagowar|Garhi|Dumarjor|Tetariyatand|Harodih|Bhadwadih"],
+["Khaira SO", "811317", "Goli BO", "R", "Goli|Jatajod|Lahkhari|Basgutiya|Baratand|Chetuadih|Pipratand|Salaiya|Posaiya"],
+["Khaira SO", "811317", "Gopalpur BO", "R", "Gopalpur|Raipura|Chouhandi"],
+["Khaira SO", "811317", "Harkhar BO", "R", "Harkhar|Chanarwar|Ropabel|Ghaskotand|Pratappur|Bhaluahi|Sirisia|Bardon|Dipakarhar|Mahendro|Rajla|Jhilar"],
+["Khaira SO", "811317", "Indpay BO", "R", "Indpay|Markatta|Borar|Manjora"],
+["Khaira SO", "811317", "Jit Jhingoibo BO", "R", "Jit Jhingio|Joga Jhingoi|Singaritand|Sarsatola|Chokhatiya"],
+["Khaira SO", "811317", "Kendih BO", "R", "Kemdih|Ballopur|Karnawada|Nawdiha|Singarpur"],
+["Khaira SO", "811317", "Kharaich BO", "R", "Kharainch|Pachrukhi|Simra|Naukadih|Gargur|Gurupur|Sakhipura|Dumariyatand|Shitalpur|Chihutiya"],
+["Khaira SO", "811317", "Khelari BO", "R", "Khelari|Harni|Pailwatari|Janakpur|Ahradih|Rarodih|Landitand|Sakdar|Taratand|Balwadih|Titahiya|Pikhadih"],
+["Khaira SO", "811317", "Mundbaro BO", "R", "Mundbaro|Bojhait|Piprakhand|Barkhutiya|Baratar|Ranganiya|Ektarwa|Dumro|Bgandar|Karkatti"],
+["Khaira SO", "811317", "Nariyana BO", "R", "Nariyana|Chancho|Bhandra|Sakdaha"],
+["Khaira SO", "811317", "Nimnawada BO", "R", "Nimnawada|Bhalni|Jaganathdih|Kurao|Teliyadih|Pachpahdi|Ambatari|Sugarkor|Bhagrar|Ojwadih|Hathiyapathhar|Ghiyatari"],
+["Khaira SO", "811317", "Pradhanchak BO", "R", "Pradhanchak|Dainikhand|Hardimoh|Boudhithika|Baghakhand"],
+["Sikandra SO", "811315", "Sikandra SO", "S", "Khutkat Gauharnagar|Azadnagar|Ramdih|Dharsanda|Acharyadih|Kripa-Ramdih|Pachmahua|Gokhula-Fatehpur|Bardih|Sikandra Bazar"],
+["Sikandra SO", "811315", "Akauni BO", "R", "Akauni|Jakhra|Mallikpur|Murgiyachak"],
+["Sikandra SO", "811315", "B bahadurpur BO", "R", "Barhamba|Bahadurpur|Mubarakpur|Rajpura|Babupur|Nima|Gonhar|Baghmariya|Basgutti"],
+["Sikandra SO", "811315", "Belchhi BO", "R", "Belchhi|Siyani|Ballopur|Silauri"],
+["Sikandra SO", "811315", "Bhulo BO", "R", "Bhulo|Nawabganj"],
+["Sikandra SO", "811315", "Dhira BO", "R", "Dhira|Jalshad|Himachaldih|Gowardhanbigha|Thekhi|Dhanpura|Damodarpur|Kaniyari|Aagat|Bandaol"],
+["Sikandra SO", "811315", "Ghonghsa BO", "R", "Ghongsa|Mohninunphar|Manikpur"],
+["Sikandra SO", "811315", "Karma BO", "R", "Karma|Kaithwara|Silhauri|Bishanpur"],
+["Sikandra SO", "811315", "Khardih BO", "R", "Khardih|Bhatta|Bhaluahi Musahri|Manpur"],
+["Sikandra SO", "811315", "Kumar BO", "R", "Kumar|Tuladih"],
+["Sikandra SO", "811315", "Lachhuar BO", "R", "Lachhuar|Mishirdih|Beldari|Dhanimatari|Phulwariya|Korasi|Jagdishpur|Jankidih|Tarahri|Bhagalpur ahar"],
+["Sikandra SO", "811315", "Lohanda BO", "R", "Lohanda|Simultala|Lahila"],
+["Sikandra SO", "811315", "M Nagar BO", "R", "Mohaddinagar|Premdiha|Raghunandanbigha|Billi|Dulrpur"],
+["Sikandra SO", "811315", "Manjosh BO", "R", "Manjhos|Parna|Narayanpur|Khojdih|Khaira|Jalaydostani|Rampurghosh|Belapar"],
+["Sikandra SO", "811315", "Matashi BO", "R", "Matasi|Bela|Mahath|Chourhi"],
+["Sikandra SO", "811315", "Mathurapur BO", "R", "Mathurapur|Nawadih|Hariharpur|Madhopur|Navkadih|Losdhani|Kuradih"],
+["Sikandra SO", "811315", "Noma BO", "R", "Noma|Sandha|Lohwara"],
+["Sikandra SO", "811315", "Patambar BO", "R", "Patambar|Kenui|Raghunathpur|Ghurmuriya|Jajal"],
+["Sikandra SO", "811315", "Pirhinda BO", "R", "Pirhinda|Pohe|Khushalpur|Achambho|Sasrawan|Lahela|Chitauni"],
+["Sikandra SO", "811315", "Rabai BO", "R", "Rabai|Rampur|Dharampur|Lowadih|Rawai Musahri"],
+["Sikandra SO", "811315", "Sarsa Bichwe BO", "R", "Sarsha bichway|Dhardhara|Husainiganj|Barabag|Tatwatola"],
+["Sikandra SO", "811315", "Sawal Bigha BO", "R", "Sabal bigha|Dubeydih"],
+["Sikandra SO", "811315", "Sijhauri BO", "R", "Sijhori|Khesar|Gourdiha|Shardabad|Bali"],
+["Sikandra SO", "811315", "Tal Saharsa BO", "R", "Talsaharsa|Bakchanpur|Manp|Sarnh|Kanchanpur"],
+["Sikandra SO", "811315", "Tarhari BO", "R", "Tarhari|Uksi|Pipra|Silhauri"],
+["Aliganj SO", "811301", "Aliganj SO", "S", "Aliganj Bazar|Sonkhar|Manpur"],
+["Aliganj SO", "811301", "Abgil Chaurasa BO", "R", "Abgil Chourasa|Parsawan|Jharjhariya|Beldariya|Bachcha Manikpur|Dharamur|Ramsagar|Tetariya|Harchimba|Kharagpur|Magrohar"],
+["Aliganj SO", "811301", "Baladih BO", "R", "Baladih|Ghanpurwa|Vijy Nagar|Azadnagar|Mahmudpur|Birjunagar|Dhugdeo Nagar"],
+["Aliganj SO", "811301", "Darkha BO", "R", "Darkha|Balda"],
+["Aliganj SO", "811301", "Dhanama BO", "R", "Dhanama|Mohanpur|Haidra|Sagma|Kurmurdhi|Saporwar"],
+["Aliganj SO", "811301", "Dinnagar BO", "R", "Dinnagar|Nagodih|Baijnathpur|Navinagar"],
+["Aliganj SO", "811301", "Hilsa BO", "R", "Hilsa|Kodwariya|Habulnagar|Nirmali|Etabandh|Laxmipur|Bhalwana|Begwa|Belatand"],
+["Aliganj SO", "811301", "Islamnagar BO", "R", "Islamnagar|Mominpur|mokhaddampur"],
+["Aliganj SO", "811301", "Kaitha BO", "R", "Kaitha"],
+["Aliganj SO", "811301", "Kaiyar BO", "R", "Kaiyar|Jagdhar|Gangti|Jogichak|Khajura|Dighaut|Bharti Masor"],
+["Aliganj SO", "811301", "Kolhana BO", "R", "Kolhana|Mainachatar"],
+["Aliganj SO", "811301", "Markama BO", "R", "Markama|Gahlour|Rishidih|Radha Nagar|Sudama Nagae|Brahamdeo Nagar|Badki Tand|Chotki Tand|Lohsani"],
+["Aliganj SO", "811301", "Mirzaganj BO", "R", "Mirzaganj"],
+["Aliganj SO", "811301", "Noni BO", "R", "Noni|Sanpo"],
+["Aliganj SO", "811301", "Pursanda BO", "R", "Pursanda|Mahna|Bhagalpur Musahri|Ratanpur|Sabsiniyabigha|Sunderbad"],
+["Aliganj SO", "811301", "Sahora BO", "R", "Sahora|Hathiya|Shahpur|Madra"],
+["Aliganj SO", "811301", "Seway BO", "R", "Sewai|Ichour|Chatar"],
+["Gidhaur SO", "811305", "Gidhaur SO", "S", ""],
+["Gidhaur SO", "811305", "Banpur BO", "R", ""],
+["Gidhaur SO", "811305", "Chango Dih BO", "R", ""],
+["Gidhaur SO", "811305", "Chuwan BO", "R", ""],
+["Gidhaur SO", "811305", "Dabil BO", "R", ""],
+["Gidhaur SO", "811305", "Dhamna BO", "R", ""],
+["Gidhaur SO", "811305", "Gagra BO", "R", ""],
+["Gidhaur SO", "811305", "Garsanda BO", "R", ""],
+["Gidhaur SO", "811305", "Ghughuldih BO", "R", ""],
+["Gidhaur SO", "811305", "Jamu Kharaiya BO", "R", ""],
+["Gidhaur SO", "811305", "Kageshwar BO", "R", ""],
+["Gidhaur SO", "811305", "Keshopur BO", "R", ""],
+["Gidhaur SO", "811305", "Kewal Fariyatta BO", "R", ""],
+["Gidhaur SO", "811305", "Kharhawa BO", "R", ""],
+["Gidhaur SO", "811305", "Mango Bandar BO", "R", ""],
+["Gidhaur SO", "811305", "Maura BO", "R", ""],
+["Gidhaur SO", "811305", "Nayagaon BO", "R", ""],
+["Gidhaur SO", "811305", "Ratanpur BO", "R", ""],
+["Gidhaur SO", "811305", "Sevai BO", "R", ""],
+["Gidhaur SO", "811305", "Sohjana BO", "R", ""],
+["Gidhaur SO", "811305", "Sonpai BO", "R", ""],
+["Gidhaur SO", "811305", "Suggi BO", "R", ""],
+["Gidhaur SO", "811305", "Tihiya BO", "R", ""],
+["Chakai SO", "811303", "Chakai SO", "S", ""],
+["Chakai SO", "811303", "Bamdah BO", "R", ""],
+["Chakai SO", "811303", "Barmoria BO", "R", ""],
+["Chakai SO", "811303", "Basbittibo BO", "R", ""],
+["Chakai SO", "811303", "Bichkorwa BO", "R", ""],
+["Chakai SO", "811303", "Bongi BO", "R", ""],
+["Chakai SO", "811303", "Chandra Mandi BO", "R", ""],
+["Chakai SO", "811303", "Chaufla BO", "R", ""],
+["Chakai SO", "811303", "Dhahwa BO", "R", ""],
+["Chakai SO", "811303", "Dulampur BO", "R", ""],
+["Chakai SO", "811303", "Gaganpur BO", "R", ""],
+["Chakai SO", "811303", "Kiya Jori BO", "R", ""],
+["Chakai SO", "811303", "Koluadih BO", "R", ""],
+["Chakai SO", "811303", "Korane BO", "R", ""],
+["Chakai SO", "811303", "Madhopur BO", "R", ""],
+["Chakai SO", "811303", "N Silfari BO", "R", ""],
+["Chakai SO", "811303", "Nauwadih BO", "R", ""],
+["Chakai SO", "811303", "Patauwa BO", "R", ""],
+["Chakai SO", "811303", "Phariatadih BO", "R", ""],
+["Chakai SO", "811303", "Pojha BO", "R", ""],
+["Chakai SO", "811303", "Ramchandradih BO", "R", ""],
+["Chakai SO", "811303", "S Batpur BO", "R", ""],
+["Chakai SO", "811303", "Saraun BO", "R", ""],
+["Chakai SO", "811303", "Tola Urba BO", "R", ""],
+["Jhajha SO", "811308", "Jhajha SO", "S", ""],
+["Jhajha SO", "811308", "Bajila BO", "R", ""],
+["Jhajha SO", "811308", "Batia BO", "R", ""],
+["Jhajha SO", "811308", "Chain BO", "R", ""],
+["Jhajha SO", "811308", "Chhapar Dih BO", "R", ""],
+["Jhajha SO", "811308", "Fatehpur BO", "R", ""],
+["Jhajha SO", "811308", "Hathia BO", "R", ""],
+["Jhajha SO", "811308", "Karhara BO", "R", ""],
+["Jhajha SO", "811308", "Karma Borba BO", "R", ""],
+["Jhajha SO", "811308", "Narganjo BO", "R", ""],
+["Jhajha SO", "811308", "Phulhara BO", "R", ""],
+["Jhajha SO", "811308", "Rajala BO", "R", ""],
+["Jhajha SO", "811308", "Sahiya BO", "R", ""],
+["Jhajha SO", "811308", "Sugba Urown BO", "R", ""],
+["Jhajha SO", "811308", "T Barajor BO", "R", ""],
+["Jhajha SO", "811308", "T Barmasia BO", "R", ""],
+["Jhajha SO", "811308", "Tabha BO", "R", ""],
+["Jhajha SO", "811308", "Tola Chhapa BO", "R", ""],
+["Laxmipur Jamui", "811312", "Laxmipur Jamui SO", "S", "Laxmiur Bazar|Najari|Khirbhojna|Dubatari|Sanchaura|Kanar|Sakal|Jogia|Adbaria|Sijua|Nawdiha|Tetaria|Dhamankunda|Kushitari|Chaukia|Sujani|Jinahara|Gondi|Domachak|Rampur|Harla|Bangardih|Donha|Guria"],
+["Laxmipur Jamui", "811312", "Anandpur BO", "R", "Anandpur|Baljor|Doura|Kenuhat|Kewli|Latehar|Basmatta|Sarhi"],
+["Laxmipur Jamui", "811312", "Arbaria BO", "R", "Arbariya|Chinberiya|Hathiyabar|Taljhari"],
+["Laxmipur Jamui", "811312", "Chati Khelar BO", "R", "Chattikhelar|Belatikur|Shivsona|Jharna|Kamlu|Kajha"],
+["Laxmipur Jamui", "811312", "Dighi BO", "R", "Dighi|Belatand|Sabalpur|Pawna|Barmaniya"],
+["Laxmipur Jamui", "811312", "Domamarhar BO", "R", "Doma Marhar|Karra|Ladumba|Karwakura|Sikhatiya|Bhotri|Purnadih|Piratand|Suknama|Teliyachoran|Banjhi Kusum"],
+["Laxmipur Jamui", "811312", "Gaura BO", "R", "Gaura|Nawkadih|Madaiya|Jaminiya Musahri|Dharwa|Nankar|Hiramba|Dighra|Pathharghatta|Simratari|Mahuagaro|Bela Tarhariya|Kewali|Taron|Mednipur|Sarhi"],
+["Laxmipur Jamui", "811312", "Kakanchaur BO", "R", "Kakanchor|Baghwa|Magahi|Hadhadiya|Sondipi"],
+["Laxmipur Jamui", "811312", "Kala BO", "R", "Kala|Narainpur|Asota|Dinahra|Bhalua|Lakatwa|Panout|Karanpur|Maslay|Bishanpur"],
+["Laxmipur Jamui", "811312", "Matia BO", "R", "Matiya|Salon|Mahuatand|Chhaparghatti|Paro|Baira|Bishanpur|Bhadwariya|Koriya|Krnariy|Abla|Biba"],
+["Laxmipur Jamui", "811312", "Mohanpur BO", "R", "Mohanpur|Nigoriya|Mangraar|Tetariya|Choudiha"],
+["Laxmipur Jamui", "811312", "Pderaun BO", "R", "Pedron|Ojhadih|Bishanpur"],
+["Laxmipur Jamui", "811312", "Telia Dih BO", "R", "Teliyadih|Latta|Dubedih|Harchak|Alagjara|Kharhi|Pachisi|Sukhasan"],
+["Simultala SO", "811316", "Simultala SO", "S", ""],
+["Simultala SO", "811316", "Bisodah BO", "R", ""],
+["Simultala SO", "811316", "Ghutwey BO", "R", ""],
+["Simultala SO", "811316", "Kalyanpur BO", "R", ""],
+["Simultala SO", "811316", "Kanodi BO", "R", ""],
+["Simultala SO", "811316", "Kewal BO", "R", ""],
+["Simultala SO", "811316", "Kharma BO", "R", ""],
+["Simultala SO", "811316", "Khuranda BO", "R", ""],
+["Simultala SO", "811316", "Mohanpur BO", "R", ""],
+["Simultala SO", "811316", "Telwa Bazar BO", "R", ""],
+["Simultala SO", "811316", "Tola Kurumtand BO", "R", ""],
+["Sono SO", "811314", "Sono SO", "S", ""],
+["Sono SO", "811314", "Aghara SO BO", "R", ""],
+["Sono SO", "811314", "Babudih BO", "R", ""],
+["Sono SO", "811314", "Balthar BO", "R", ""],
+["Sono SO", "811314", "Bishanpur BO", "R", ""],
+["Sono SO", "811314", "Charkapathal BO", "R", ""],
+["Sono SO", "811314", "Chhuchhnaria BO", "R", ""],
+["Sono SO", "811314", "Dhodhari BO", "R", ""],
+["Sono SO", "811314", "Dumari BO", "R", ""],
+["Sono SO", "811314", "Jhundo BO", "R", ""],
+["Sono SO", "811314", "Keshofarka BO", "R", ""],
+["Sono SO", "811314", "Loha BO", "R", ""],
+["Sono SO", "811314", "Maheshwari BO", "R", ""],
+["Sono SO", "811314", "Naiyadih BO", "R", ""],
+["Sono SO", "811314", "P Matihana BO", "R", ""],
+["Barhiya SO", "811302", "Barhiya SO", "S", ""],
+["Barhiya SO", "811302", "B Dariyapur SO", "S", ""],
+["Barhiya SO", "811302", "Birupur SO", "S", ""],
+["Barhiya SO", "811302", "Chetan Tola Khutha BO", "R", ""],
+["Barhiya SO", "811302", "Dumari BO", "R", ""],
+["Barhiya SO", "811302", "Gangasarai BO", "R", ""],
+["Barhiya SO", "811302", "Jaitpur BO", "R", ""],
+["Barhiya SO", "811302", "Jalalpur Nauranga BO", "R", ""],
+["Barhiya SO", "811302", "Khutha BO", "R", ""],
+["Barhiya SO", "811302", "L Kalyanpur BO", "R", ""],
+["Barhiya SO", "811302", "Pali BO", "R", ""],
+["Barhiya SO", "811302", "Pipariya BO", "R", ""],
+["Barhiya SO", "811302", "Sadaibigha BO", "R", ""],
+["Barhiya SO", "811302", "Talsharma BO", "R", ""],
+["Jamui HO", "", "Beat", "B", ""]
+];
+
+        const typeMap = {"B": "Delivery Beat", "S": "Sub Post Office", "R": "Branch Post Office", "H": "Head Post Office"};
+        const typeClassMap = {"B": "type-beat", "S": "type-so", "R": "type-bo", "H": "type-ho"};
+
+        let directoryData = [];
+
+        const pinFilter = document.getElementById('pinFilter');
+        const soFilter = document.getElementById('soFilter');
+        const typeFilter = document.getElementById('typeFilter');
+        const searchInput = document.getElementById('searchInput');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const statsCount = document.getElementById('statsCount');
+        const printMeta = document.getElementById('printMeta');
+        const voiceSearchBtn = document.getElementById('voiceSearchBtn');
+
+        function loadData() {
+            directoryData = rawData.map((item, index) => ({
+                id: index, 
+                parentSO: item[0],
+                pin: item[1],
+                name: item[2],
+                typeCode: item[3],
+                type: typeMap[item[3]],
+                typeClass: typeClassMap[item[3]],
+                villages: item[4] ? item[4].split('|') : []
+            }));
+
+            const currentPin = pinFilter.value;
+            const currentSO = soFilter.value;
+
+            pinFilter.innerHTML = '<option value="">All PIN Codes</option>';
+            const uniquePins = [...new Set(directoryData.map(item => item.pin))].filter(p => p).sort();
+            uniquePins.forEach(pin => {
+                const opt = document.createElement('option');
+                opt.value = pin; opt.textContent = `PIN: ${pin}`;
+                pinFilter.appendChild(opt);
+            });
+            pinFilter.value = currentPin;
+
+            soFilter.innerHTML = '<option value="">All Parent SOs / HOs</option>';
+            const uniqueSOs = [...new Set(directoryData.map(item => item.parentSO))].sort();
+            uniqueSOs.forEach(so => {
+                const opt = document.createElement('option');
+                opt.value = so; opt.textContent = so;
+                soFilter.appendChild(opt);
+            });
+            soFilter.value = currentSO;
+        }
+
+        function phoneticNormalize(str) {
+            if(!str) return "";
+            return str.toLowerCase()
+                .replace(/sh/g, 's')
+                .replace(/ph/g, 'f')
+                .replace(/v/g, 'w')
+                .replace(/z/g, 'j')
+                .replace(/ee/g, 'i')
+                .replace(/oo/g, 'u')
+                .replace(/ou/g, 'o')
+                .replace(/au/g, 'o')
+                .replace(/bh/g, 'b')
+                .replace(/dh/g, 'd')
+                .replace(/gh/g, 'g')
+                .replace(/kh/g, 'k')
+                .replace(/jh/g, 'j')
+                .replace(/th/g, 't')
+                .replace(/ch/g, 'c')
+                .replace(/([a-z])\1+/g, '$1')
+                .replace(/[^a-z0-9]/g, '');
+        }
+
+        function renderResults() {
+            const query = searchInput.value.trim().toLowerCase();
+            const normQuery = phoneticNormalize(query);
+            const selectedPin = pinFilter.value;
+            const selectedSO = soFilter.value;
+            const selectedType = typeFilter.value;
+
+            const hasFilter = query !== '' || selectedPin !== '' || selectedSO !== '' || selectedType !== '';
+
+            if (!hasFilter) {
+                statsCount.textContent = 'Ready to search';
+                resultsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <h3>Enter search criteria</h3>
+                        <p style="color: #777; margin-top: 5px;">Type a village/PIN, use mic, or pick a filter above.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const filtered = directoryData.filter(item => {
+                const matchesPin = !selectedPin || item.pin === selectedPin;
+                const matchesSO = !selectedSO || item.parentSO === selectedSO;
+                const matchesType = !selectedType || item.typeCode === selectedType;
+
+                if (!matchesPin || !matchesSO || !matchesType) return false;
+                if (!query) return true;
+
+                const exactName = item.name.toLowerCase().includes(query);
+                const exactParent = item.parentSO.toLowerCase().includes(query);
+                const exactPin = item.pin.includes(query);
+                const exactVillage = item.villages.some(v => v.toLowerCase().includes(query));
+                
+                if (exactName || exactParent || exactPin || exactVillage) return true;
+
+                if (normQuery.length >= 3) {
+                    const normName = phoneticNormalize(item.name);
+                    const normParent = phoneticNormalize(item.parentSO);
+                    if (normName.includes(normQuery) || normParent.includes(normQuery)) return true;
+                    
+                    return item.villages.some(v => phoneticNormalize(v).includes(normQuery));
+                }
+
+                return false;
+            });
+
+            statsCount.textContent = `Showing ${filtered.length} unit${filtered.length === 1 ? '' : 's'}`;
+
+            const dateStr = new Date().toLocaleString('en-IN');
+            const criteria = [];
+            if (query) criteria.push(`Keyword: "${searchInput.value.trim()}"`);
+            if (selectedPin) criteria.push(`PIN: ${selectedPin}`);
+            if (selectedSO) criteria.push(`SO: ${selectedSO}`);
+            if (selectedType) criteria.push(`Type: ${typeMap[selectedType]}`);
+            const criteriaStr = criteria.length > 0 ? criteria.join(' | ') : 'All Division Records';
+            printMeta.innerHTML = `Filter: <strong>${criteriaStr}</strong> &bull; Total: <strong>${filtered.length} Units</strong> &bull; ${dateStr}`;
+
+            if (filtered.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <h3>No sorting destinations found</h3>
+                        <p style="color: #777; margin-top: 5px;">Try adjusting your keywords or clearing filters.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const rowsHtml = filtered.map(item => {
+                const pills = item.villages.map(v => {
+                    let isMatched = false;
+                    if (query) {
+                        if (v.toLowerCase().includes(query)) {
+                            isMatched = true;
+                        } else if (normQuery.length >= 3 && phoneticNormalize(v).includes(normQuery)) {
+                            isMatched = true;
+                        }
+                    }
+                    return `<span class="table-village-pill ${isMatched ? 'highlight' : ''}">${v}</span>`;
+                }).join('');
+
+                return `
+                    <tr>
+                        <td style="white-space: nowrap;"><span class="pin-badge"><i class="fa-solid fa-location-dot"></i> ${item.pin || 'N/A'}</span></td>
+                        <td>
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div>
+                                    <span class="office-cell-name">${item.name}</span>
+                                    <span class="office-cell-parent">Under ${item.parentSO}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="white-space: nowrap;"><span class="type-badge ${item.typeClass}">${item.type}</span></td>
+                        <td>
+                            <div style="font-size: 0.78rem; font-weight: 700; color: #555; margin-bottom: 4px;">
+                                <i class="fa-solid fa-route"></i> ${item.villages.length} Localities / Villages:
+                            </div>
+                            <div class="village-pill-wrap">
+                                ${pills}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            resultsContainer.innerHTML = `
+                <div class="table-container">
+                    <table class="directory-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 110px;">PIN</th>
+                                <th style="width: 240px;">Office & Parent</th>
+                                <th style="width: 140px;">Type</th>
+                                <th>Coverage Area / Villages</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-IN';
+
+            voiceSearchBtn.addEventListener('click', () => {
+                try { recognition.start(); } catch (e) { recognition.stop(); }
+            });
+
+            recognition.onstart = () => {
+                voiceSearchBtn.classList.add('listening');
+                voiceSearchBtn.title = 'Listening... Speak now';
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                searchInput.value = transcript.replace(/[.,]/g, '');
+                renderResults();
+            };
+
+            recognition.onerror = () => { voiceSearchBtn.classList.remove('listening'); };
+            recognition.onend = () => {
+                voiceSearchBtn.classList.remove('listening');
+                voiceSearchBtn.title = 'Voice Search';
+            };
+        } else {
+            voiceSearchBtn.style.display = 'none';
+        }
+
+        searchInput.addEventListener('input', renderResults);
+        pinFilter.addEventListener('change', renderResults);
+        soFilter.addEventListener('change', renderResults);
+        typeFilter.addEventListener('change', renderResults);
+
+        resetBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            pinFilter.value = '';
+            soFilter.value = '';
+            typeFilter.value = '';
+            renderResults();
+        });
+
+        loadData();
+        renderResults();
+    </script>
+</body>
+</html>
