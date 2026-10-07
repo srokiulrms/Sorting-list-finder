@@ -123,6 +123,43 @@
             .table-village-pill.highlight { text-decoration: underline !important; font-weight: bold !important; }
         }
         footer { background: #222; color: #aaa; padding: 16px; font-size: 0.78rem; text-align: center; border-top: 3px solid var(--dop-red); margin-top: 30px; }
+/* Bottom Information Pane */
+.info-pane {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff3cd; /* Soft yellow background */
+    border-top: 2px solid var(--dop-yellow);
+    color: var(--text-dark);
+    padding: 12px 16px;
+    text-align: center;
+    font-size: 0.9rem;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.info-pane strong {
+    color: var(--dop-dark-red);
+    font-weight: 700;
+}
+
+/* Add padding to the footer so it doesn't get hidden behind the fixed pane */
+footer {
+    padding-bottom: 60px; 
+}
+
+/* Hide the pane when printing */
+@media print {
+    .info-pane {
+        display: none !important;
+    }
+}
     </style>
 </head>
 <body>
@@ -184,6 +221,10 @@
     <footer>
         <p>&copy; 2026 RMS 'PT' Division, Kiul &bull; Department of Posts &bull; India Post Sorting Network</p>
     </footer>
+<div class="info-pane">
+    <strong><i class="fa-solid fa-lightbulb"></i> Do you Know?</strong> 
+    <span id="didYouKnowText">chowkiya BO is under Fatehpur SO, Gaya RMS.</span>
+</div>
 
     <script>
     // Register Service Worker
@@ -1196,6 +1237,22 @@
 
         loadData();
         renderResults();
+    // Array of facts
+const postalFacts = [
+    "chowkiya BO is under Fatehpur SO, Gaya RMS.",
+    "The first postage stamp of India was introduced on 1 July 1852 in the Scinde district.",
+    "India has the largest postal network in the world with over 1.5 Lakh post offices.",
+    "PIN code system was introduced in India on 15 August 1972."
+];
+
+// Pick a random fact and display it
+window.addEventListener('DOMContentLoaded', () => {
+    const factSpan = document.getElementById('didYouKnowText');
+    if (factSpan) {
+        const randomIndex = Math.floor(Math.random() * postalFacts.length);
+        factSpan.textContent = postalFacts[randomIndex];
+    }
+});
     </script>
 </body>
 </html>
