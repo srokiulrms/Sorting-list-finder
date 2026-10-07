@@ -160,10 +160,7 @@ footer {
         display: none !important;
     }
 }
-#didYouKnowText {
-    transition: opacity 0.4s ease-in-out;
-    display: inline-block;
-}
+
     </style>
 </head>
 <body>
@@ -229,42 +226,7 @@ footer {
     <strong><i class="fa-solid fa-lightbulb"></i> Do you Know?</strong> 
     <span id="didYouKnowText">chowkiya BO is under Fatehpur SO, Gaya RMS.</span>
 </div>
-// List of postal facts to display
-const postalFacts = [
-    "Chowkiya BO is under Fatehpur SO, Gaya RMS.",
-    "The first postage stamp of India was introduced on 1 July 1852 in the Scinde district.",
-    "India has the largest postal network in the world with over 1.5 Lakh post offices.",
-    "PIN code system was introduced in India on 15 August 1972.",
-    "The Floating Post Office in Dal Lake, Srinagar, is the only floating post office in the world."
-];
 
-let currentFactIndex = 0;
-
-function cycleFacts() {
-    const factSpan = document.getElementById('didYouKnowText');
-    if (!factSpan) return;
-
-    // Fade out text
-    factSpan.style.opacity = '0';
-
-    setTimeout(() => {
-        // Change to next fact
-        currentFactIndex = (currentFactIndex + 1) % postalFacts.length;
-        factSpan.textContent = postalFacts[currentFactIndex];
-        
-        // Fade in text
-        factSpan.style.opacity = '1';
-    }, 400);
-}
-
-// Start rotating every 6 seconds
-window.addEventListener('DOMContentLoaded', () => {
-    const factSpan = document.getElementById('didYouKnowText');
-    if (factSpan) {
-        factSpan.style.transition = 'opacity 0.4s ease-in-out';
-        setInterval(cycleFacts, 6000);
-    }
-});
     <script>
     // Register Service Worker
     if ('serviceWorker' in navigator) {
