@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#c4122f">
+  <title>Sorting List Download &amp; Print</title>
+  <style>
+    :root { color-scheme: light; font-family: Arial, Helvetica, sans-serif; color: #171717; background: #f3f5f8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header { background: #900c22; color: #fff; padding: 18px 22px; }
+    header h1 { margin: 0 0 5px; font-size: 1.45rem; }
+    header p { margin: 0; font-weight: 600; }
+    main { max-width: 1200px; margin: 20px auto; padding: 0 14px; }
+    .controls, .summary { background: #fff; border: 1px solid #d5d9df; border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+    .controls { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+    label { display: grid; gap: 6px; font-weight: 700; }
+    select, input, button { font: inherit; padding: 10px 12px; border: 1px solid #777; border-radius: 5px; }
+    select, input { background: #fff; min-width: 190px; }
+    button { cursor: pointer; background: #900c22; color: #fff; border: 0; font-weight: 800; }
+    button.secondary { background: #252525; }
+    button:hover { filter: brightness(1.12); }
+    .summary { font-weight: 800; }
+    .table-wrap { overflow-x: auto; background: #fff; border: 1px solid #777; }
+    table { width: 100%; border-collapse: collapse; min-width: 760px; }
+    th, td { padding: 10px; border: 1px solid #777; text-align: left; vertical-align: top; }
+    th { background: #e5e5e5; font-weight: 900; }
+    td { font-weight: 700; }
+    .areas { white-space: pre-wrap; }
+    .error { color: #900c22; font-weight: 800; }
+    @media print {
+      @page { size: landscape; margin: 12mm; }
+      body, main { background: #fff; margin: 0; padding: 0; max-width: none; }
+      header { background: #fff; color: #000; border-bottom: 3px solid #000; padding: 0 0 10px; }
+      header h1 { font-size: 18pt; }
+      .controls { display: none !important; }
+      .summary { border: 0; padding: 8px 0; margin: 0; }
+      .table-wrap { overflow: visible; border: 0; }
+      table { min-width: 0; font-size: 9pt; }
+      th, td { padding: 5px; border: 1px solid #333; }
+      th { background: #ddd !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      tr { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Kiul RMS Sorting &amp; Beat Directory</h1>
+    <p>Download the complete list or filter by PIN code for a clear, bold printout.</p>
+  </header>
+  <main>
+    <section class="controls" aria-label="Sorting list actions">
+      <label>PIN code
+        <select id="pinFilter"><option value="">All PIN codes</option></select>
+      </label>
+      <label>Search office / locality
+        <input id="searchInput" type="search" placeholder="Type a name or locality">
+      </label>
+      <button id="downloadCsv" type="button">Download all CSV</button>
+      <button id="downloadPrint" class="secondary" type="button">Download printable HTML</button>
+      <button id="printBtn" type="button">Print current list</button>
+    </section>
+    <div id="status" class="summary" role="status">Loading directory…</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>PIN code</th><th>Parent SO / HO</th><th>Sorting office / beat</th><th>Type</th><th>Sorting list / covered localities</th></tr></thead>
+        <tbody id="results"></tbody>
+      </table>
+    </div>
+    <p id="error" class="error" role="alert"></p>
+  </main>
+<script>
+(() => {
+  'use strict';
+  const typeNames = { H: 'Head Post Office', S: 'Sub Post Office', R: 'Branch Post Office', B: 'Delivery Beat' };
+  const pinFilter = document.getElementById('pinFilter');
+  const searchInput = document.getElementById('searchInput');
+  const results = document.getElementById('results');
+  const status = document.getElementById('status');
+  const error = document.getElementById('error');
+  let directory = [];
+
+  function currentRows() {
+    const pin = pinFilter.value;
+    const query = searchInput.value.trim().toLocaleLowerCase();
+    return directory.filter(row => {
+      const matchesPin = !pin || String(row[1] || '') === pin;
+      const searchable = row.map(value => String(value ?? '')).join(' ').toLocaleLowerCase();
+      return matchesPin && (!query || searchable.includes(query));
+    });
+  }
+
+  function render() {
+    const rows = currentRows();
+    results.replaceChildren();
+    const fragment = document.createDocumentFragment();
+    for (const row of rows) {
+      const tr = document.createElement('tr');
+      const cells = [row[1] || 'N/A', row[0] || '', row[2] || '', typeNames[row[3]] || row[3] || '', String(row[4] || '').split('|').filter(Boolean).join(' · ') || '—'];
+      cells.forEach((value, index) => {
+        const td = document.createElement('td');
+        td.textContent = value;
+        if (index === 4) td.className = 'areas';
+        tr.appendChild(td);
+      });
+      fragment.appendChild(tr);
+    }
+    results.appendChild(fragment);
+    status.textContent = `Showing ${rows.length} of ${directory.length} sorting-list entries${pinFilter.value ? ` · PIN ${pinFilter.value}` : ''}${searchInput.value.trim() ? ` · Search: ${searchInput.value.trim()}` : ''}`;
+  }
+
+  function csvEscape(value) {
+    return `"${String(value ?? '').replaceAll('"', '""')}"`;
+  }
+
+  function rowValues(row) {
+    return [row[1] || '', row[0] || '', row[2] || '', typeNames[row[3]] || row[3] || '', String(row[4] || '').split('|').filter(Boolean).join('; ')];
+  }
+
+  function saveFile(filename, content, mimeType) {
+    const blob = new Blob([ '\ufeff', content ], { type: mimeType });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  }
+
+  function printableDocument(rows) {
+    const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+    const body = rows.map(row => `<tr>${rowValues(row).map(value => `<td>${esc(value || '—')}</td>`).join('')}</tr>`).join('');
+    const pinLabel = pinFilter.value ? `PIN ${esc(pinFilter.value)}` : 'All PIN codes';
+    return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Sorting list — ${pinLabel}</title><style>@page{size:landscape;margin:12mm}body{font:11pt Arial,sans-serif;color:#000}h1{font-size:20pt;margin:0 0 6px}p{font-weight:bold}table{width:100%;border-collapse:collapse}th,td{border:1px solid #333;padding:6px;text-align:left;vertical-align:top;font-weight:bold}th{background:#ddd}tr{break-inside:avoid}</style></head><body><h1>Kiul RMS Sorting &amp; Beat Directory</h1><p>${pinLabel} · ${rows.length} entries</p><table><thead><tr><th>PIN code</th><th>Parent SO / HO</th><th>Sorting office / beat</th><th>Type</th><th>Sorting list / covered localities</th></tr></thead><tbody>${body}</tbody></table></body></html>`;
+  }
+
+  document.getElementById('downloadCsv').addEventListener('click', () => {
+    const header = ['PIN code', 'Parent SO / HO', 'Sorting office / beat', 'Type', 'Sorting list / covered localities'];
+    const lines = [header, ...directory.map(rowValues)].map(row => row.map(csvEscape).join(',')).join('\r\n');
+    saveFile('kiul-rms-sorting-list-all.csv', lines, 'text/csv;charset=utf-8');
+  });
+  document.getElementById('downloadPrint').addEventListener('click', () => {
+    const pinPart = pinFilter.value ? `-${pinFilter.value}` : '-all-pins';
+    saveFile(`kiul-rms-sorting-list${pinPart}.html`, printableDocument(currentRows()), 'text/html;charset=utf-8');
+  });
+  document.getElementById('printBtn').addEventListener('click', () => window.print());
+  pinFilter.addEventListener('change', render);
+  searchInput.addEventListener('input', render);
+
+  fetch('./index.html', { cache: 'no-store' })
+    .then(response => {
+      if (!response.ok) throw new Error(`Could not load index.html (${response.status}).`);
+      return response.text();
+    })
+    .then(source => {
+      const startMarker = 'let rawData = [';
+      const start = source.indexOf(startMarker);
+      const end = source.indexOf('\n];', start);
+      if (start < 0 || end < 0) throw new Error('Could not locate the sorting-list data in index.html.');
+      directory = JSON.parse(source.slice(start + 'let rawData = '.length, end + 2));
+      const pins = [...new Set(directory.map(row => String(row[1] || '').trim()).filter(Boolean))].sort();
+      for (const pin of pins) {
+        const option = document.createElement('option');
+        option.value = pin;
+        option.textContent = pin;
+        pinFilter.appendChild(option);
+      }
+      render();
+    })
+    .catch(err => {
+      status.textContent = 'Directory could not be loaded.';
+      error.textContent = `${err.message} Open this page from the published GitHub Pages site, not as a local file.`;
+    });
+})();
+</script>
+</body>
+</html>
